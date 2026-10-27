@@ -1,0 +1,879 @@
+<title>Bus Portoviejo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Doto:wght@700;900&family=Figtree:wght@400;500;600;700;800&display=swap">
+<style>/*__LEAFLET_CSS__*/</style>
+<style>
+/* Layout: app de una pantalla. Móvil: barra, mapa arriba, panel abajo con scroll. Escritorio: panel a la izquierda, mapa a la derecha. */
+:root {
+  --bg: #f3f5f1;
+  --surface: #ffffff;
+  --ink: #15201a;
+  --muted: #5a6960;
+  --line: #d9e0da;
+  --accent: #0d7a4c;          /* verde manabita: la línea */
+  --accent-soft: #e2f1e8;
+  --bus: #f0a10a;             /* unidades en el mapa */
+  --bus-ink: #1d1503;
+  --sign-bg: #141812;         /* letrero LED del bus */
+  --sign-led: #ffb21f;
+  --sign-dim: #6b5a2c;
+  --ok: #1d8a48;   --ok-soft: #e1f3e7;
+  --warn: #a86d00; --warn-soft: #fdf0d3;
+  --bad: #c0352b;  --bad-soft: #fbe3e0;
+  --m-ground: #eceee8;
+  --m-minor: #ffffff;
+  --m-major: #fbe9b7;
+  --m-casing: #d2d6cd;
+  --m-park: #d3e8cc;
+  --m-river: #a9cde3;
+  --m-label: #5f6b63;
+  --f-sign: "Doto", ui-monospace, "Courier New", monospace;
+  --f-ui: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --r: 12px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1310; --surface: #161d18; --ink: #e5ece6; --muted: #97a59c; --line: #28322b;
+    --accent: #3fbf83; --accent-soft: #173326;
+    --bus: #ffb21f; --bus-ink: #1d1503;
+    --sign-bg: #090b08; --sign-led: #ffb21f; --sign-dim: #4d4226;
+    --ok: #4cc57d; --ok-soft: #15301f; --warn: #f1b33c; --warn-soft: #34290f; --bad: #f0796e; --bad-soft: #3a1915;
+    --m-ground: #111713; --m-minor: #232c26; --m-major: #3b3a29; --m-casing: #1a211c;
+    --m-park: #1a2d1f; --m-river: #1d3a4d; --m-label: #8b978f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1310; --surface: #161d18; --ink: #e5ece6; --muted: #97a59c; --line: #28322b;
+  --accent: #3fbf83; --accent-soft: #173326;
+  --bus: #ffb21f; --bus-ink: #1d1503;
+  --sign-bg: #090b08; --sign-led: #ffb21f; --sign-dim: #4d4226;
+  --ok: #4cc57d; --ok-soft: #15301f; --warn: #f1b33c; --warn-soft: #34290f; --bad: #f0796e; --bad-soft: #3a1915;
+  --m-ground: #111713; --m-minor: #232c26; --m-major: #3b3a29; --m-casing: #1a211c;
+  --m-park: #1a2d1f; --m-river: #1d3a4d; --m-label: #8b978f;
+  color-scheme: dark;
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--f-ui); font-size: 15px; line-height: 1.45;
+  overflow: hidden;
+}
+.app {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(220px, 44%) 1fr;
+  grid-template-areas: "bar" "map" "panel";
+}
+@media (min-width: 860px) {
+  .app {
+    grid-template-columns: 390px 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas: "bar bar" "panel map";
+  }
+}
+
+/* Barra superior */
+.bar {
+  grid-area: bar;
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding-block: 10px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+.brand h1 { font-size: 17px; font-weight: 800; letter-spacing: -0.01em; margin: 0; }
+.line-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12.5px; font-weight: 600; color: var(--accent);
+  background: var(--accent-soft); border-radius: 999px; padding: 3px 10px 3px 8px;
+  white-space: nowrap;
+}
+.line-chip i { width: 14px; height: 4px; border-radius: 2px; background: var(--accent); display: block; }
+.clock {
+  margin-left: auto; display: flex; align-items: baseline; gap: 6px;
+  font-variant-numeric: tabular-nums; font-weight: 700; font-size: 17px;
+}
+.clock small { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
+/* Mapa */
+#map { grid-area: map; min-height: 0; background: var(--m-ground); }
+.leaflet-container { background: var(--m-ground); font-family: var(--f-ui); }
+.leaflet-bar a, .leaflet-bar a:hover { background: var(--surface); color: var(--ink); border-bottom-color: var(--line); }
+.leaflet-bar { border: 1px solid var(--line) !important; box-shadow: none !important; }
+.leaflet-control-attribution { background: color-mix(in srgb, var(--surface) 85%, transparent) !important; color: var(--muted); font-size: 10.5px; }
+.leaflet-control-attribution a { color: var(--accent); }
+.leaflet-top.leaflet-left { margin-left: env(safe-area-inset-left, 0px); }
+.leaflet-bottom.leaflet-right { margin-right: env(safe-area-inset-right, 0px); }
+
+.street-label span {
+  display: block; transform-origin: center; white-space: nowrap;
+  font-size: 11px; font-weight: 600; color: var(--m-label); letter-spacing: 0.02em;
+  text-shadow: 0 0 3px var(--m-ground), 0 0 3px var(--m-ground), 0 0 2px var(--m-ground);
+  translate: -50% -50%;
+}
+.zoom-low .street-label { display: none; }
+.chev span {
+  display: block; width: 0; height: 0; translate: -50% -50%;
+  border-left: 4px solid transparent; border-right: 4px solid transparent;
+  border-bottom: 6px solid var(--surface);
+}
+.zoom-low .chev { display: none; }
+
+.bus-mk { position: relative; width: 30px; height: 30px; }
+.bus-mk .dir { position: absolute; inset: -8px; }
+.bus-mk .dir::before {
+  content: ""; position: absolute; left: 50%; top: 0; translate: -50% 0;
+  border-left: 6px solid transparent; border-right: 6px solid transparent;
+  border-bottom: 8px solid var(--bus-ink);
+}
+.bus-mk b {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  background: var(--bus); color: var(--bus-ink);
+  border: 2.5px solid var(--bus-ink); border-radius: 9px;
+  font-size: 12px; font-weight: 800; font-variant-numeric: tabular-nums;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.25);
+}
+.bus-mk.is-mine b { outline: 3px solid var(--accent); outline-offset: 1px; }
+
+.leaflet-tooltip.stop-tip {
+  background: var(--surface); color: var(--ink); border: 1px solid var(--line);
+  border-radius: 8px; box-shadow: 0 2px 8px rgb(0 0 0 / 0.12);
+  font-family: var(--f-ui); font-size: 12px; font-weight: 600; padding: 3px 8px;
+}
+.leaflet-tooltip.stop-tip::before { display: none; }
+.leaflet-tooltip.stop-tip.mine { background: var(--accent); color: var(--surface); border-color: var(--accent); }
+.leaflet-tooltip.stop-tip.dest { border: 2px solid var(--ink); }
+.leaflet-tooltip.stop-tip small { display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.8; }
+
+/* Panel */
+.panel {
+  grid-area: panel; min-height: 0; overflow-y: auto;
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  padding-block: 16px calc(20px + env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 16px;
+}
+@media (min-width: 860px) { .panel { border-top: 0; border-right: 1px solid var(--line); } }
+
+/* Letrero LED */
+.sign {
+  background: var(--sign-bg); color: var(--sign-led);
+  border-radius: var(--r); padding: 14px 16px 12px;
+  display: grid; gap: 4px;
+  background-image: radial-gradient(rgb(255 255 255 / 0.035) 1px, transparent 1.2px);
+  background-size: 4px 4px;
+}
+.sign-top {
+  display: flex; justify-content: space-between; gap: 8px;
+  font-size: 11.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--sign-led); opacity: 0.85;
+}
+.sign-top span:last-child { text-align: right; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sign-main { display: flex; align-items: baseline; gap: 10px; font-family: var(--f-sign); line-height: 1; }
+.sign-main .num { font-size: clamp(58px, 16vw, 76px); font-weight: 900; font-variant-numeric: tabular-nums; text-shadow: 0 0 14px rgb(255 178 31 / 0.35); }
+.sign-main .unit { font-size: 26px; font-weight: 700; }
+.sign-main .at { margin-left: auto; font-size: 22px; font-weight: 700; color: var(--sign-led); opacity: 0.75; }
+.sign-sub { font-size: 13px; color: var(--sign-led); opacity: 0.8; }
+
+/* Veredicto */
+.verdict {
+  border-radius: var(--r); padding: 12px 14px;
+  display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; align-items: center;
+}
+.verdict .pill {
+  grid-row: span 2;
+  font-size: 12px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 6px 10px; border-radius: 8px; color: var(--surface); white-space: nowrap;
+}
+.verdict strong { font-size: 15px; }
+.verdict p { margin: 0; font-size: 13.5px; color: var(--muted); }
+.verdict.ok { background: var(--ok-soft); } .verdict.ok .pill { background: var(--ok); }
+.verdict.warn { background: var(--warn-soft); } .verdict.warn .pill { background: var(--warn); }
+.verdict.bad { background: var(--bad-soft); } .verdict.bad .pill { background: var(--bad); }
+
+/* Campos */
+.fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; }
+.field { display: grid; gap: 4px; min-width: 0; }
+.field.wide { grid-column: 1 / -1; }
+.field label, .h {
+  font-size: 11.5px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted);
+}
+select, .stepper {
+  font: inherit; font-size: 15px; font-weight: 600; color: var(--ink);
+  background: var(--bg); border: 1px solid var(--line); border-radius: 10px;
+  min-height: 42px; width: 100%;
+}
+select { padding: 8px 10px; }
+.stepper { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; overflow: hidden; }
+.stepper button {
+  font: inherit; font-size: 20px; font-weight: 700; color: var(--accent);
+  background: transparent; border: 0; height: 100%; cursor: pointer;
+}
+.stepper button:hover { background: var(--accent-soft); }
+.stepper output { text-align: center; font-variant-numeric: tabular-nums; }
+:focus-visible { outline: 2.5px solid var(--accent); outline-offset: 2px; }
+
+.trip {
+  display: flex; gap: 12px; align-items: center;
+  border: 1px solid var(--line); border-radius: var(--r); padding: 10px 14px;
+}
+.trip .big { font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.trip p { margin: 0; font-size: 13.5px; color: var(--muted); min-width: 0; }
+.trip p b { color: var(--ink); }
+
+/* Lista de unidades */
+.buses { list-style: none; margin: 0; padding: 0; display: grid; }
+.buses li {
+  display: grid; grid-template-columns: auto 1fr auto; gap: 2px 12px; align-items: center;
+  padding: 10px 4px; border-top: 1px solid var(--line); cursor: pointer; border-radius: 6px;
+}
+.buses li:hover { background: var(--bg); }
+.buses li:first-child { border-top: 0; }
+.buses .u {
+  grid-row: span 2; width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center;
+  background: var(--bus); color: var(--bus-ink); font-weight: 800; font-size: 13px; border: 2px solid var(--bus-ink);
+}
+.buses .where { font-size: 14px; font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.buses .meta { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.buses .eta { grid-row: span 2; text-align: right; font-weight: 800; font-size: 17px; font-variant-numeric: tabular-nums; }
+.buses .eta small { display: block; font-size: 11.5px; font-weight: 600; color: var(--muted); }
+.gps { display: inline-flex; align-items: center; gap: 5px; }
+.gps::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--ok); }
+
+/* Simulación */
+.sim { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding-top: 4px; border-top: 1px dashed var(--line); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
+.seg button, .btn {
+  font: inherit; font-size: 13px; font-weight: 700; color: var(--ink);
+  background: var(--surface); border: 0; padding: 7px 12px; cursor: pointer;
+}
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+.btn { border: 1px solid var(--line); border-radius: 9px; }
+.note { margin: 0; font-size: 12.5px; color: var(--muted); max-width: 60ch; }
+
+.live {
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  font-size: 12.5px; font-weight: 700; padding: 3px 10px; border-radius: 999px;
+  background: var(--bg); border: 1px solid var(--line);
+}
+.live i { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+.live.on i { background: var(--ok); box-shadow: 0 0 0 3px var(--ok-soft); }
+.live.off { color: var(--bad); } .live.off i { background: var(--bad); }
+.tag {
+  font-size: 10.5px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--accent); background: var(--accent-soft); padding: 1px 6px; border-radius: 5px; margin-left: 6px;
+}
+.buses .u.real { background: var(--accent); color: var(--surface); border-color: var(--accent); }
+.buses li.stale { opacity: 0.6; }
+.buses li.empty { display: block; cursor: default; color: var(--muted); font-size: 14px; }
+.buses li.empty:hover { background: none; }
+.gps.old::before { background: var(--warn); } .gps.dead::before { background: var(--bad); }
+.verdict.idle { background: var(--bg); } .verdict.idle .pill { background: var(--muted); }
+.check { display: inline-flex; gap: 8px; align-items: center; font-size: 13.5px; font-weight: 600; cursor: pointer; }
+.check input { width: 18px; height: 18px; accent-color: var(--accent); margin: 0; }
+.bus-mk.real b { background: var(--accent); color: var(--surface); border-color: var(--surface); }
+.bus-mk.real::after {
+  content: ""; position: absolute; inset: -6px; border-radius: 13px; border: 2px solid var(--accent);
+  animation: ping 1.8s ease-out infinite; pointer-events: none;
+}
+@keyframes ping { from { opacity: 0.8; transform: scale(0.8); } to { opacity: 0; transform: scale(1.5); } }
+.bus-mk.stale b { filter: grayscale(1); opacity: 0.55; }
+.bus-mk.stale::after { display: none; }
+@media (prefers-reduced-motion: reduce) { .bus-mk.real::after { animation: none; opacity: 0.6; } }
+@media (max-width: 420px) { .clock small { display: none; } .line-chip { font-size: 11.5px; } .brand h1 { font-size: 15px; } }
+@media (prefers-reduced-motion: reduce) { .sign-main .num { text-shadow: none; } }
+</style>
+
+<div class="app">
+  <header class="bar">
+    <div class="brand">
+      <h1>Bus Portoviejo</h1>
+      <span class="line-chip"><i></i>Circular San Gregorio – UTM</span>
+    </div>
+    <span class="live" id="live" hidden><i></i><span id="liveText">Conectando…</span></span>
+    <div class="clock"><small>hora simulada</small><span id="clock">06:45</span></div>
+  </header>
+
+  <div id="map" aria-label="Mapa de la ruta con los buses en tiempo real"></div>
+
+  <aside class="panel">
+    <section class="sign" aria-live="polite">
+      <div class="sign-top"><span id="signLabel">Tu próximo bus</span><span id="signStop">—</span></div>
+      <div class="sign-main"><span class="num" id="signNum">--</span><span class="unit" id="signUnit">min</span><span class="at" id="signAt"></span></div>
+      <div class="sign-sub" id="signSub">Calculando…</div>
+    </section>
+
+    <div class="verdict ok" id="verdict">
+      <span class="pill" id="vPill">—</span>
+      <strong id="vTitle">—</strong>
+      <p id="vText"></p>
+    </div>
+
+    <div class="fields">
+      <div class="field">
+        <label for="mine">Mi parada</label>
+        <select id="mine"></select>
+      </div>
+      <div class="field">
+        <label for="dest">Voy a</label>
+        <select id="dest"></select>
+      </div>
+      <div class="field wide">
+        <label for="walkOut">Camino de mi casa a la parada</label>
+        <div class="stepper">
+          <button type="button" id="walkMinus" aria-label="Un minuto menos">−</button>
+          <output id="walkOut" aria-live="polite">4 min</output>
+          <button type="button" id="walkPlus" aria-label="Un minuto más">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="trip" id="trip">
+      <span class="big" id="tripArr">--:--</span>
+      <p id="tripText"></p>
+    </div>
+
+    <section>
+      <div class="h">Unidades en la línea</div>
+      <ol class="buses" id="buses"></ol>
+    </section>
+
+    <div class="sim">
+      <span class="h" id="simLabel">Simulación</span>
+      <div class="seg" id="speedSeg" role="group" aria-label="Velocidad de la simulación">
+        <button type="button" data-speed="1" aria-pressed="false">×1</button>
+        <button type="button" data-speed="10" aria-pressed="true">×10</button>
+        <button type="button" data-speed="30" aria-pressed="false">×30</button>
+      </div>
+      <button type="button" class="btn" id="pause" aria-pressed="false">Pausar</button>
+      <label class="check" id="simToggle" hidden><input type="checkbox" id="showSim" checked> Mostrar también los 3 buses simulados</label>
+    </div>
+    <p class="note" id="note">Prototipo. La línea, sus 3 unidades y los tiempos son simulados; cada bus envía su posición GPS cada 5 segundos, como lo haría un rastreador real. Las calles y paradas están sobre el mapa real de Portoviejo (OpenStreetMap). Toca una parada en el mapa para elegirla como tuya.</p>
+  </aside>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+const DATA = /*__DATA__*/null;
+
+// ---------- Geometría ----------
+function decode(arr, offset = 0) {
+  let la = Math.round(DATA.origin[0] * DATA.q), lo = Math.round(DATA.origin[1] * DATA.q);
+  const out = [];
+  for (let i = offset; i < arr.length; i += 2) { la += arr[i]; lo += arr[i + 1]; out.push([la / DATA.q, lo / DATA.q]); }
+  return out;
+}
+function dist(a, b) {
+  const R = 6371000, r = Math.PI / 180;
+  const dla = (b[0] - a[0]) * r, dlo = (b[1] - a[1]) * r;
+  const h = Math.sin(dla / 2) ** 2 + Math.cos(a[0] * r) * Math.cos(b[0] * r) * Math.sin(dlo / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+const ROUTE = decode(DATA.route);
+const CUM = [0];
+for (let i = 1; i < ROUTE.length; i++) CUM.push(CUM[i - 1] + dist(ROUTE[i - 1], ROUTE[i]));
+const L_TOTAL = CUM[CUM.length - 1] + dist(ROUTE[ROUTE.length - 1], ROUTE[0]);
+const STOPS = DATA.stops.map((s, i) => ({ ...s, i, at: Math.min(s.at, L_TOTAL) }));
+const mod = (x) => ((x % L_TOTAL) + L_TOTAL) % L_TOTAL;
+const ahead = (from, to) => mod(to - from);   // metros hacia adelante en la ruta
+
+function pointAt(s) {
+  s = mod(s);
+  let lo = 0, hi = CUM.length - 1;
+  while (lo < hi) { const m = (lo + hi + 1) >> 1; if (CUM[m] <= s) lo = m; else hi = m - 1; }
+  const a = ROUTE[lo], b = ROUTE[(lo + 1) % ROUTE.length];
+  const segLen = (lo + 1 < CUM.length ? CUM[lo + 1] : L_TOTAL) - CUM[lo];
+  const t = segLen > 0 ? (s - CUM[lo]) / segLen : 0;
+  const lat = a[0] + (b[0] - a[0]) * t, lon = a[1] + (b[1] - a[1]) * t;
+  const brg = Math.atan2((b[1] - a[1]) * Math.cos(a[0] * Math.PI / 180), b[0] - a[0]) * 180 / Math.PI;
+  return { lat, lon, brg };
+}
+function streetAt(s) {
+  s = mod(s);
+  let name = DATA.streets[DATA.streets.length - 1][1];
+  for (const [pos, nm] of DATA.streets) { if (pos <= s) name = nm; else break; }
+  return name.replace(/^Avenida /, 'Av. ');
+}
+function legOf(s) {           // índice de la parada que el bus dejó atrás
+  s = mod(s);
+  let k = STOPS.length - 1;
+  for (let i = 0; i < STOPS.length; i++) if (STOPS[i].at <= s) k = i;
+  return k;
+}
+
+// ---------- Modelo de operación ----------
+// Velocidad media histórica por tramo (m/s). En el centro el bus va más lento.
+const LEG_SPEED = [7.2, 6.6, 4.8, 4.0, 4.4, 5.6, 6.4, 6.6, 6.8, 7.2];
+const DWELL_AVG = 25;          // segundos promedio detenido en cada parada
+const GPS_EVERY = 5;           // el rastreador reporta cada 5 s
+
+function legLen(k) {
+  const a = STOPS[k].at, b = k + 1 < STOPS.length ? STOPS[k + 1].at : L_TOTAL;
+  return b - a;
+}
+// Tiempo estimado (s) para ir de la posición s hasta la parada j, usando el historial
+function travelTime(s, j) {
+  let t = 0, pos = mod(s), k = legOf(pos), remaining = ahead(pos, STOPS[j].at);
+  let guard = 0;
+  while (remaining > 0.5 && guard++ < 30) {
+    const end = k + 1 < STOPS.length ? STOPS[k + 1].at : L_TOTAL;
+    const chunk = Math.min(remaining, end - pos);
+    t += chunk / LEG_SPEED[k];
+    remaining -= chunk;
+    k = (k + 1) % STOPS.length;
+    pos = STOPS[k].at;
+    if (remaining > 0.5) t += DWELL_AVG;   // se detiene en las paradas intermedias
+  }
+  return t;
+}
+function stopsBetween(s, j) {
+  let n = 0;
+  for (const st of STOPS) { const d = ahead(s, st.at); if (d > 1 && d < ahead(s, STOPS[j].at) - 1) n++; }
+  return n;
+}
+
+// ---------- Modo ----------
+// 'demo': solo buses simulados (la versión publicada).
+// 'real': la página la sirve servidor.py y además muestra los celulares con Traccar Client.
+const MODE = /*__MODE__*/'demo';
+const REAL = MODE === 'real';
+
+// ---------- Simulación de los buses ----------
+const secOfDay = (ms) => { const d = new Date(ms); return d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds() + d.getMilliseconds() / 1000; };
+let simT = REAL ? secOfDay(Date.now()) : 6 * 3600 + 45 * 60;
+let speed = REAL ? 1 : 10, paused = false;
+const rand = (a, b) => a + Math.random() * (b - a);
+const BUSES = [
+  { id: '14', s: 300 },
+  { id: '22', s: 300 + L_TOTAL / 3 },
+  { id: '31', s: 300 + 2 * L_TOTAL / 3 },
+].map((b, n) => ({
+  ...b, kind: 'sim', key: 'sim:' + b.id,
+  s: mod(b.s), dwell: 0, phase: rand(0, 6.28), phase2: rand(0, 6.28),
+  next: (legOf(b.s) + 1) % STOPS.length,
+  ping: null, prev: null, pingT: simT - n * 1.7,
+}));
+BUSES.forEach(b => { b.ping = { s: b.s, t: b.pingT, dwell: false }; b.prev = { ...b.ping }; });
+
+function stepBus(b, dt) {
+  if (b.dwell > 0) { b.dwell -= dt; return; }
+  const k = legOf(b.s);
+  const toNext = ahead(b.s, STOPS[b.next].at);
+  const fromLast = ahead(STOPS[k].at, b.s);
+  // tráfico: variación lenta propia de cada unidad
+  const traffic = 1 + 0.22 * Math.sin(simT / 170 + b.phase) + 0.12 * Math.sin(simT / 53 + b.phase2);
+  const ease = Math.min(1, 0.3 + Math.min(toNext, fromLast) / 90);
+  const v = LEG_SPEED[k] * 1.15 * traffic * ease;
+  const move = v * dt;
+  if (move >= toNext) {
+    b.s = STOPS[b.next].at;
+    b.dwell = rand(14, 40);
+    b.next = (b.next + 1) % STOPS.length;
+  } else {
+    b.s = mod(b.s + move);
+  }
+}
+function tick(dtSim) {
+  let left = dtSim;
+  while (left > 0) {
+    const dt = Math.min(1, left);
+    simT += dt; left -= dt;
+    for (const b of BUSES) {
+      stepBus(b, dt);
+      if (simT - b.pingT >= GPS_EVERY) {
+        b.prev = b.ping;
+        b.pingT = simT;
+        b.ping = { s: b.s, t: simT, dwell: b.dwell > 0 };
+      }
+    }
+  }
+}
+// Posición que se muestra: lo último que reportó el GPS, animado entre los dos últimos reportes
+function shownS(b) {
+  const f = Math.min(1, (simT - b.ping.t) / GPS_EVERY);
+  return mod(b.prev.s + ahead(b.prev.s, b.ping.s) * f);
+}
+
+// ---------- Celulares reales (Traccar Client) ----------
+const DEVICES = new Map();     // id del celular -> unidad
+const OFF_ROUTE = 80;          // metros: más lejos que esto, el celular no está sobre la ruta
+const STALE = 120;             // segundos sin señal para considerarlo desconectado
+
+// Punto de la ruta más cercano a una posición GPS. Si ya sabíamos dónde iba,
+// preferimos un punto cerca de ese para no saltar a otro tramo que pase al lado.
+function project(lat, lon, prevS) {
+  const k = Math.cos(lat * Math.PI / 180), M = 111320;
+  let best = null, near = null;
+  for (let i = 0; i < ROUTE.length; i++) {
+    const a = ROUTE[i], b = ROUTE[(i + 1) % ROUTE.length];
+    const ax = (a[1] - lon) * k * M, ay = (a[0] - lat) * M;
+    const dx = (b[1] - a[1]) * k * M, dy = (b[0] - a[0]) * M;
+    const len2 = dx * dx + dy * dy;
+    const t = len2 ? Math.max(0, Math.min(1, -(ax * dx + ay * dy) / len2)) : 0;
+    const d = Math.hypot(ax + t * dx, ay + t * dy);
+    const segEnd = i + 1 < CUM.length ? CUM[i + 1] : L_TOTAL;
+    const c = { s: mod(CUM[i] + t * (segEnd - CUM[i])), d };
+    if (!best || d < best.d) best = c;
+    const close = prevS != null && (ahead(prevS, c.s) < 400 || ahead(c.s, prevS) < 60);
+    if (close && (!near || d < near.d)) near = c;
+  }
+  return near && near.d < best.d + 20 ? near : best;
+}
+function bearing(a, b) {
+  return Math.atan2((b[1] - a[1]) * Math.cos(a[0] * Math.PI / 180), b[0] - a[0]) * 180 / Math.PI;
+}
+
+function onPosition(p) {
+  if (p == null || p.lat == null || p.lon == null || p.id == null) return;
+  let u = DEVICES.get(p.id);
+  const isNew = !u;
+  if (isNew) {
+    u = { id: String(p.id), kind: 'real', key: 'real:' + p.id };
+    DEVICES.set(p.id, u);
+    addMarker(u);
+  }
+  if (u.last && p.t <= u.last.t) return;      // posición repetida o atrasada
+  const pr = project(p.lat, p.lon, u.ping ? u.ping.s : null);
+  const from = u.last ? shownLatLng(u) : [p.lat, p.lon];
+  let brg = p.course != null && p.course >= 0 ? p.course : null;
+  if (brg == null && u.last && dist([u.last.lat, u.last.lon], [p.lat, p.lon]) > 3) brg = bearing([u.last.lat, u.last.lon], [p.lat, p.lon]);
+  u.brg = brg ?? u.brg ?? pointAt(pr.s).brg;
+  u.last = p;
+  u.off = pr.d;
+  const nearStop = STOPS.some(st => ahead(st.at, pr.s) < 30 || ahead(pr.s, st.at) < 30);
+  u.ping = { s: pr.s, t: secOfDay(p.t), dwell: nearStop && (p.speed ?? 0) < 1 };
+  u.anim = { from, start: performance.now() };
+  if (isNew && pr.d > OFF_ROUTE && !map.getBounds().contains([p.lat, p.lon])) {
+    // el celular está lejos de la ruta (por ejemplo, en tu casa): que se vea en el mapa
+    const b = layers.route.getBounds();
+    map.invalidateSize();
+    map.fitBounds(L.latLngBounds(b.getSouthWest(), b.getNorthEast()).extend([p.lat, p.lon]), { padding: [40, 40] });
+  }
+}
+function shownLatLng(u) {
+  const to = [u.last.lat, u.last.lon];
+  if (!u.anim) return to;
+  const f = Math.min(1, (performance.now() - u.anim.start) / 900);
+  return [u.anim.from[0] + (to[0] - u.anim.from[0]) * f, u.anim.from[1] + (to[1] - u.anim.from[1]) * f];
+}
+const ageOf = (u) => Math.max(0, simT - u.ping.t);
+const isStale = (u) => u.kind === 'real' && ageOf(u) > STALE;
+
+// ETA que calcularía la app, solo con los datos del GPS. null = no se puede estimar.
+function etaTo(u, j) {
+  if (u.kind === 'real' && (u.off > OFF_ROUTE || isStale(u))) return null;
+  const d = ahead(u.ping.s, STOPS[j].at);
+  if (u.ping.dwell && (d < 30 || d > L_TOTAL - 30)) return { sec: 0, here: true, d: 0 };
+  const sec = Math.max(0, travelTime(u.ping.s, j) - ageOf(u));
+  return { sec, here: false, d };
+}
+
+// ---------- Utilidades de formato ----------
+const pad = (n) => String(n).padStart(2, '0');
+const hhmm = (t) => { t = Math.round(t / 60) * 60; return pad(Math.floor(t / 3600) % 24) + ':' + pad(Math.floor(t / 60) % 60); };
+const km = (m) => m < 1000 ? Math.round(m / 10) * 10 + ' m' : (m / 1000).toLocaleString('es-EC', { maximumFractionDigits: 1 }) + ' km';
+const mins = (sec) => Math.max(0, Math.round(sec / 60));
+const ago = (sec) => sec < 90 ? Math.round(sec) + ' s' : sec < 5400 ? Math.round(sec / 60) + ' min' : 'mucho';
+const plural = (n, a, b) => n + ' ' + (n === 1 ? a : b);
+const shortName = (n) => n === 'Estadio Reales Tamarindos' ? 'Estadio' : n;
+const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const unitName = (u) => (u.kind === 'real' ? 'Celular ' : 'Unidad ') + u.id;
+const unitRef = (u) => (u.kind === 'real' ? 'el celular ' : 'la unidad ') + u.id;   // dentro de una frase
+
+// ---------- Estado de la persona ----------
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('busPV.' + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem('busPV.' + k, JSON.stringify(v)); } catch {} },
+};
+let mine = store.get('mine', STOPS.findIndex(s => s.name === 'Terminal Terrestre'));
+let dest = store.get('dest', STOPS.findIndex(s => s.name === 'UTM'));
+let walk = store.get('walk', 4);
+let showSim = REAL ? store.get('showSim', true) : true;
+if (!(mine >= 0 && mine < STOPS.length)) mine = 2;
+if (!(dest >= 0 && dest < STOPS.length)) dest = 7;
+
+// ---------- Mapa ----------
+const map = L.map('map', { preferCanvas: true, zoomSnap: 0.25, minZoom: 11, maxZoom: 18, zoomControl: true });
+map.attributionControl.setPrefix(false);
+map.attributionControl.addAttribution('Calles © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">colaboradores de OpenStreetMap</a>');
+const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+const roadsByClass = { 1: [], 2: [], 3: [], 4: [] };
+for (const r of DATA.roads) roadsByClass[r[0]].push(decode(r, 1));
+const layers = {
+  parks: L.polygon(DATA.parks.map(p => [decode(p)]), { interactive: false, stroke: false, fillOpacity: 1 }),
+  river: L.polyline(DATA.river.map(p => decode(p)), { interactive: false, weight: 9, lineCap: 'round' }),
+  minor: L.polyline(roadsByClass[1], { interactive: false, weight: 2.2 }),
+  mid: L.polyline(roadsByClass[2], { interactive: false, weight: 3.4 }),
+  casing: L.polyline([...roadsByClass[3], ...roadsByClass[4]], { interactive: false, weight: 6.5 }),
+  major: L.polyline([...roadsByClass[3], ...roadsByClass[4]], { interactive: false, weight: 4.5 }),
+  routeCase: L.polyline([...ROUTE, ROUTE[0]], { interactive: false, weight: 9, opacity: 0.25 }),
+  route: L.polyline([...ROUTE, ROUTE[0]], { interactive: false, weight: 5.5 }),
+};
+function paintMap() {
+  layers.parks.setStyle({ fillColor: css('--m-park') });
+  layers.river.setStyle({ color: css('--m-river') });
+  layers.minor.setStyle({ color: css('--m-minor') });
+  layers.mid.setStyle({ color: css('--m-minor') });
+  layers.casing.setStyle({ color: css('--m-casing') });
+  layers.major.setStyle({ color: css('--m-major') });
+  layers.routeCase.setStyle({ color: css('--accent') });
+  layers.route.setStyle({ color: css('--accent') });
+  stopMarkers.forEach((m, i) => styleStop(m, i));
+}
+Object.values(layers).forEach(l => l.addTo(map));
+
+for (const [name, lat, lon, ang] of DATA.labels) {
+  L.marker([lat, lon], {
+    interactive: false, keyboard: false,
+    icon: L.divIcon({ className: 'street-label', html: `<span style="transform:rotate(${ang}deg)">${name}</span>`, iconSize: [0, 0] }),
+  }).addTo(map);
+}
+for (let s = 250; s < L_TOTAL; s += 450) {
+  const p = pointAt(s);
+  L.marker([p.lat, p.lon], {
+    interactive: false, keyboard: false,
+    icon: L.divIcon({ className: 'chev', html: `<span style="transform:rotate(${p.brg}deg)"></span>`, iconSize: [0, 0] }),
+  }).addTo(map);
+}
+
+const stopMarkers = STOPS.map((st, i) => {
+  const m = L.circleMarker([st.lat, st.lon], { radius: 6, weight: 3, fillOpacity: 1 }).addTo(map);
+  m.on('click', () => { if (i !== mine) { if (i === dest) dest = mine; mine = i; save(); refreshSelects(); refreshStops(); render(); } });
+  return m;
+});
+function styleStop(m, i) {
+  const isMine = i === mine, isDest = i === dest;
+  m.setStyle({
+    radius: isMine ? 9 : isDest ? 8 : 6,
+    color: isDest && !isMine ? css('--ink') : css('--accent'),
+    fillColor: isMine ? css('--accent') : css('--surface'),
+    weight: isMine || isDest ? 3.5 : 3,
+  });
+}
+function refreshStops() {
+  stopMarkers.forEach((m, i) => {
+    styleStop(m, i);
+    m.unbindTooltip();
+    const isMine = i === mine, isDest = i === dest;
+    const label = isMine ? `<small>Mi parada</small>${STOPS[i].name}` : isDest ? `<small>Voy a</small>${STOPS[i].name}` : STOPS[i].name;
+    m.bindTooltip(label, {
+      permanent: isMine || isDest, direction: 'right', offset: [10, 0],
+      className: 'stop-tip' + (isMine ? ' mine' : isDest ? ' dest' : ''),
+    });
+    if (isMine || isDest) m.bringToFront();
+  });
+}
+
+function addMarker(u) {
+  const label = u.kind === 'real' ? u.id.slice(0, 3) : u.id;
+  u.marker = L.marker([0, 0], {
+    keyboard: false, zIndexOffset: u.kind === 'real' ? 2000 : 1000,
+    icon: L.divIcon({ className: '', html: `<div class="bus-mk ${u.kind}"><span class="dir"></span><b>${esc(label)}</b></div>`, iconSize: [30, 30], iconAnchor: [15, 15] }),
+  });
+  u.marker.bindTooltip(esc(unitName(u)), { direction: 'top', offset: [0, -16], className: 'stop-tip' });
+  if (u.kind === 'real' || showSim) u.marker.addTo(map);
+}
+BUSES.forEach(addMarker);
+function placeMarker(u) {
+  if (!map.hasLayer(u.marker)) return;
+  let ll, brg;
+  if (u.kind === 'sim') { const p = pointAt(shownS(u)); ll = [p.lat, p.lon]; brg = p.brg; }
+  else { ll = shownLatLng(u); brg = u.brg; }
+  u.marker.setLatLng(ll);
+  const el = u.marker.getElement();
+  if (el) {
+    el.querySelector('.dir').style.transform = `rotate(${brg}deg)`;
+    el.querySelector('.bus-mk').classList.toggle('stale', isStale(u));
+  }
+}
+const units = () => [...(showSim ? BUSES : []), ...DEVICES.values()];
+
+map.fitBounds(layers.route.getBounds(), { padding: [24, 24] });
+const zoomClass = () => map.getContainer().classList.toggle('zoom-low', map.getZoom() < 14.5);
+map.on('zoomend', zoomClass); zoomClass();
+
+// ---------- Panel ----------
+const $ = (id) => document.getElementById(id);
+function refreshSelects() {
+  const opts = STOPS.map((s, i) => `<option value="${i}">${s.name}</option>`).join('');
+  $('mine').innerHTML = opts; $('dest').innerHTML = opts;
+  $('mine').value = mine; $('dest').value = dest;
+  $('walkOut').textContent = walk + ' min';
+}
+function save() { store.set('mine', mine); store.set('dest', dest); store.set('walk', walk); }
+$('mine').addEventListener('change', e => { const v = +e.target.value; if (v === dest) dest = mine; mine = v; save(); refreshSelects(); refreshStops(); render(); });
+$('dest').addEventListener('change', e => { const v = +e.target.value; if (v === mine) mine = dest; dest = v; save(); refreshSelects(); refreshStops(); render(); });
+$('walkMinus').addEventListener('click', () => { walk = Math.max(1, walk - 1); save(); refreshSelects(); render(); });
+$('walkPlus').addEventListener('click', () => { walk = Math.min(30, walk + 1); save(); refreshSelects(); render(); });
+document.querySelectorAll('[data-speed]').forEach(btn => btn.addEventListener('click', () => {
+  speed = +btn.dataset.speed;
+  document.querySelectorAll('[data-speed]').forEach(x => x.setAttribute('aria-pressed', x === btn));
+}));
+$('pause').addEventListener('click', () => {
+  paused = !paused;
+  $('pause').textContent = paused ? 'Reanudar' : 'Pausar';
+  $('pause').setAttribute('aria-pressed', paused);
+});
+$('showSim').checked = showSim;
+$('showSim').addEventListener('change', e => {
+  showSim = e.target.checked; store.set('showSim', showSim);
+  BUSES.forEach(b => showSim ? b.marker.addTo(map) : b.marker.remove());
+  render();
+});
+
+function render() {
+  units().forEach(placeMarker);
+  $('clock').textContent = hhmm(simT);
+
+  // llegadas a mi parada
+  const all = units().map(u => ({ u, e: etaTo(u, mine) }));
+  const arr = all.filter(a => a.e).map(a => ({ u: a.u, ...a.e })).sort((x, y) => x.sec - y.sec);
+  const rest = all.filter(a => !a.e).map(a => a.u);
+  const walkSec = walk * 60;
+  const catchIdx = arr.findIndex(a => a.sec + 20 >= walkSec);   // 20 s de margen: el bus se queda un ratito en la parada
+  const first = arr[0], target = arr[catchIdx] ?? arr[arr.length - 1];
+
+  units().forEach(u => u.marker.getElement()?.querySelector('.bus-mk').classList.toggle('is-mine', !!target && u === target.u));
+
+  // letrero
+  $('signStop').textContent = 'a ' + shortName(STOPS[mine].name);
+  const v = $('verdict');
+  if (!target) {
+    $('signNum').textContent = '--'; $('signUnit').textContent = 'min'; $('signAt').textContent = '';
+    $('signSub').textContent = REAL ? 'Ningún celular está transmitiendo sobre la ruta.' : 'No hay buses en la ruta.';
+    v.className = 'verdict idle'; $('vPill').textContent = 'Sin datos';
+    $('vTitle').textContent = 'Todavía no hay buses en la ruta';
+    $('vText').textContent = REAL ? 'Cuando un celular con Traccar Client esté a menos de 80 m de la ruta, aquí verás cuándo llega.' : '';
+  } else {
+    const tb = target.u, tName = unitName(tb);
+    if (target.here || target.sec < 45) {
+      $('signNum').textContent = target.here ? 'YA' : '<1';
+      $('signUnit').textContent = target.here ? '' : 'min';
+    } else {
+      $('signNum').textContent = mins(target.sec);
+      $('signUnit').textContent = 'min';
+    }
+    $('signAt').textContent = hhmm(simT + target.sec);
+    $('signSub').textContent = target.here
+      ? `${tName} está en la parada`
+      : `${tName} · a ${km(target.d)} · ${plural(stopsBetween(tb.ping.s, mine), 'parada', 'paradas')} antes · va por ${streetAt(tb.ping.s)}`;
+
+    // veredicto
+    const slack = Math.floor((target.sec - walkSec) / 60);
+    if (catchIdx === 0 && slack >= 3) {
+      v.className = 'verdict ok'; $('vPill').textContent = 'Tranquilo';
+      $('vTitle').textContent = `Tienes ${slack} min antes de salir`;
+      $('vText').textContent = `Sal a las ${hhmm(simT + target.sec - walkSec)} y llegas a la parada justo a tiempo.`;
+    } else if (catchIdx === 0) {
+      v.className = 'verdict warn'; $('vPill').textContent = 'Sal ya';
+      $('vTitle').textContent = slack <= 0 ? 'Sal ahora mismo' : `Sal en ${slack} min como máximo`;
+      $('vText').textContent = `Caminas ${walk} min y ${unitRef(tb)} llega en ${mins(target.sec)} min.`;
+    } else if (catchIdx > 0) {
+      v.className = 'verdict bad'; $('vPill').textContent = 'No llegas';
+      $('vTitle').textContent = `${unitName(first.u)} se te va`;
+      const leave = Math.max(0, Math.floor((target.sec - walkSec) / 60));
+      $('vText').textContent = `Llega en ${first.here ? '0' : mins(first.sec)} min y tú tardas ${walk}. Espera ${unitRef(tb)}: llega en ${mins(target.sec)} min, sal en ${leave} min.`;
+    } else {
+      v.className = 'verdict bad'; $('vPill').textContent = 'No llegas';
+      $('vTitle').textContent = `${tName} se te va`;
+      $('vText').textContent = `Llega en ${target.here ? '0' : mins(target.sec)} min y tú tardas ${walk}. No hay otra unidad transmitiendo en la ruta.`;
+    }
+  }
+
+  // viaje hasta el destino
+  const ride = travelTime(STOPS[mine].at, dest) + DWELL_AVG;
+  const nStops = stopsBetween(STOPS[mine].at, dest);
+  $('tripArr').textContent = target ? hhmm(simT + target.sec + ride) : mins(ride) + ' min';
+  $('tripText').innerHTML = target
+    ? `Llegas a <b>${STOPS[dest].name}</b> en ${esc(unitRef(target.u))}. Viaje de ${mins(ride)} min, ${plural(nStops, 'parada', 'paradas')} en el camino, ${km(ahead(STOPS[mine].at, STOPS[dest].at))}.`
+    : `de viaje hasta <b>${STOPS[dest].name}</b>, ${plural(nStops, 'parada', 'paradas')} en el camino, ${km(ahead(STOPS[mine].at, STOPS[dest].at))}.`;
+
+  // lista de unidades: primero las que llegan, después las que están fuera de la ruta o sin señal
+  const rows = [...arr.map(a => ({ u: a.u, e: a })), ...rest.map(u => ({ u, e: null }))];
+  $('buses').innerHTML = rows.length ? rows.map(({ u, e }) => {
+    const age = ageOf(u);
+    let status;
+    if (isStale(u)) status = `Sin señal hace ${ago(age)}`;
+    else if (u.kind === 'real' && u.off > OFF_ROUTE) status = `Fuera de la ruta · a ${km(u.off)}`;
+    else if (u.ping.dwell) status = `Detenido en ${shortName(STOPS[legOf(u.ping.s)].name)}`;
+    else status = `Por ${streetAt(u.kind === 'sim' ? shownS(u) : u.ping.s)}`;
+    const eta = !e ? '—' : e.here ? 'En la parada' : e.sec < 45 ? 'Llegando' : mins(e.sec) + ' min';
+    const gpsCls = age > STALE ? 'dead' : age > 20 ? 'old' : '';
+    const extra = u.kind === 'real'
+      ? [u.last.accuracy != null ? `precisión ${Math.round(u.last.accuracy)} m` : '', u.last.battery != null ? `batería ${Math.round(u.last.battery)}%` : ''].filter(Boolean).join(' · ')
+      : '';
+    const toStop = e ? `a ${km(e.d)} de tu parada` : '';
+    return `<li data-key="${esc(u.key)}" tabindex="0" role="button" aria-label="Ver ${esc(unitName(u))} en el mapa"${isStale(u) ? ' class="stale"' : ''}>
+      <span class="u ${u.kind}">${esc(u.kind === 'real' ? u.id.slice(0, 3) : u.id)}</span>
+      <span class="where">${u.kind === 'real' ? `${esc(unitName(u))}<span class="tag">GPS real</span> · ` : ''}${esc(status)}</span>
+      <span class="eta">${eta}<small>${e ? hhmm(simT + e.sec) : ''}</small></span>
+      <span class="meta"><span class="gps ${gpsCls}">GPS hace ${ago(age)}</span>${[extra, toStop].filter(Boolean).map(x => ' · ' + x).join('')}</span>
+    </li>`;
+  }).join('') : `<li class="empty">${REAL ? 'Esperando el primer celular. Abre Traccar Client y pulsa iniciar.' : 'No hay unidades.'}</li>`;
+}
+$('buses').addEventListener('click', e => {
+  const li = e.target.closest('li[data-key]'); if (!li) return;
+  const u = units().find(x => x.key === li.dataset.key);
+  if (u) map.flyTo(u.marker.getLatLng(), Math.max(map.getZoom(), 16), { duration: 0.8 });
+});
+$('buses').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.target.closest('li')?.click(); } });
+
+// ---------- Conexión con servidor.py (solo en modo real) ----------
+function setLive(state, text) {
+  const el = $('live');
+  el.className = 'live ' + state;
+  $('liveText').textContent = text;
+}
+if (REAL) {
+  $('live').hidden = false;
+  $('speedSeg').hidden = true; $('pause').hidden = true;
+  $('simToggle').hidden = false;
+  $('simLabel').textContent = 'Pruebas';
+  document.querySelector('.clock small').textContent = 'hora';
+  $('note').textContent = 'Modo en vivo. Las unidades marcadas «GPS real» son celulares con Traccar Client que envían su ubicación a tu computadora. La ruta y las paradas siguen siendo de ejemplo; si el celular está a más de 80 m de la ruta, aparece en el mapa pero sin tiempo de llegada.';
+  setLive('', 'Conectando…');
+  const es = new EventSource('/eventos');
+  es.onopen = () => setLive('on', 'En vivo');
+  es.onerror = () => setLive('off', 'Sin conexión con el servidor');
+  es.onmessage = (ev) => {
+    let msg; try { msg = JSON.parse(ev.data); } catch { return; }
+    (Array.isArray(msg) ? msg : [msg]).forEach(onPosition);
+    render();
+  };
+  setInterval(() => {
+    if ($('live').classList.contains('off')) return;
+    const n = [...DEVICES.values()].filter(u => !isStale(u)).length;
+    setLive('on', n ? `En vivo · ${plural(n, 'celular', 'celulares')}` : 'En vivo · esperando celulares');
+  }, 1000);
+}
+
+// ---------- Bucle ----------
+refreshSelects(); refreshStops(); paintMap();
+let last = performance.now(), acc = 0;
+function frame(now) {
+  const dtReal = Math.min(1, (now - last) / 1000); last = now;
+  if (!paused) tick(dtReal * speed);
+  if (REAL) simT = secOfDay(Date.now());
+  acc += dtReal;
+  // la animación de los buses va a cada cuadro; el panel se refresca 4 veces por segundo
+  units().forEach(placeMarker);
+  if (acc >= 0.25) { acc = 0; render(); }
+  requestAnimationFrame(frame);
+}
+render();
+requestAnimationFrame(frame);
+
+// tema: recolorear el mapa cuando cambie
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', paintMap);
+new MutationObserver(paintMap).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+</script>

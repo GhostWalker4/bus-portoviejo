@@ -1,0 +1,13 @@
+# Posiciones GPS reales: son datos personales de quien llevaba el celular
+app/recorridos/
+
+# Python
+__pycache__/
+*.pyc
+
+# Pruebas locales y configuración de cada persona
+prueba*.html
+.claude/settings.local.json
+.vscode/
+.DS_Store
+Thumbs.db
