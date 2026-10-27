@@ -6,7 +6,7 @@ La idea es mostrarle al municipio y a las cooperativas que esto funciona: primer
 
 ## Qué hay hoy
 
-- **Una demo simulada** ([`demo/index.html`](demo/index.html)): el mapa real de Portoviejo con una línea de ejemplo, *Circular San Gregorio – UTM*, que tiene 10 paradas y 3 buses simulados. La página calcula cuándo llega el bus a tu parada, te dice **Tranquilo / Sal ya / No llegas** según lo que tardas caminando y a qué hora llegas a tu destino. Se abre con doble clic, sin instalar nada.
+- **Una demo simulada** ([`demo/index.html`](demo/index.html)): el mapa real de Portoviejo con una línea de ejemplo, *Circular San Gregorio – UTM*, que tiene 10 paradas y 3 buses simulados. La página calcula cuándo llega el bus a tu parada, te dice **Tranquilo / Sal ya / No llegas** según lo que tardas caminando y a qué hora llegas a tu destino. El mapa tiene dos vistas: **isométrica**, con los 7.600 edificios del centro levantados en 3D, y **cenital**, plana y vista desde arriba. Se abre con doble clic, sin instalar nada.
 - **Un modo en vivo** ([`app/`](app/)): un servidor en Python que recibe la ubicación de celulares con **Traccar Client** y la muestra en el mapa al instante. Guarda cada recorrido en un CSV.
 - **Un generador** ([`generador/`](generador/)): los scripts que arman el mapa y la ruta a partir de OpenStreetMap.
 
@@ -44,7 +44,7 @@ demo/
 generador/
   template.html        el código de la página (HTML, CSS y JavaScript): aquí se edita la interfaz
   targets.json         las paradas: nombre, ubicación aproximada y calle donde va
-  descargar.py         baja calles y rutas de OpenStreetMap/OSRM
+  descargar.py         baja calles, edificios y rutas de OpenStreetMap/OSRM
   snap.py              coloca cada parada sobre su calle
   build.py             arma data.json (ruta, paradas y mapa base comprimidos)
   inject.py            produce demo/index.html y app/web/
@@ -64,7 +64,9 @@ generador/
    python generador/inject.py
    ```
 
-3. Si la ruta sale de la zona del mapa, amplía `ZONA` en `descargar.py` y ejecuta antes `python generador/descargar.py mapa`.
+3. Si la ruta sale de la zona del mapa, amplía `ZONA` en `descargar.py` y ejecuta antes `python generador/descargar.py mapa` y `python generador/descargar.py edificios`.
+
+La altura de los edificios sale de OpenStreetMap cuando tiene pisos o altura (unos 200 de 7.600). Para el resto se estima en `build.py`: casas de 1 a 3 pisos y alturas típicas según el tipo de edificio. Cada piso que alguien cargue en OpenStreetMap hace el mapa más real.
 
 Las velocidades promedio por tramo, que se usan para estimar la llegada, están en `LEG_SPEED` dentro de `template.html`. Hay un valor por cada tramo entre paradas. Hoy son inventadas; la idea es reemplazarlas por las de recorridos reales grabados con Traccar.
 
@@ -85,9 +87,9 @@ Las velocidades promedio por tramo, que se usan para estimar la llegada, están 
 
 ## Créditos
 
-- Calles, río y parques: © colaboradores de [OpenStreetMap](https://www.openstreetmap.org/copyright), bajo licencia ODbL.
+- Calles, edificios, río y parques: © colaboradores de [OpenStreetMap](https://www.openstreetmap.org/copyright), bajo licencia ODbL.
 - Trazado de rutas: [OSRM](https://project-osrm.org/).
-- Mapa interactivo: [Leaflet](https://leafletjs.com/) (BSD-2-Clause).
+- Mapa interactivo y 3D: [MapLibre GL JS](https://maplibre.org/) (BSD-3-Clause).
 - Envío de ubicación: [Traccar Client](https://www.traccar.org/client/).
 
 ## Licencia

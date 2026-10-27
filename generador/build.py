@@ -28,6 +28,11 @@ def dp(pts, tol):
         return [a, b]
     return dp(pts[:idx + 1], tol)[:-1] + dp(pts[idx:], tol)
 
+def dp_ring(pts, tol):
+    """Douglas-Peucker para un anillo cerrado (primer punto = último): se simplifica en dos mitades."""
+    k = len(pts) // 2
+    return dp(pts[:k + 1], tol)[:-1] + dp(pts[k:], tol)
+
 def enc(pts):
     out, plat, plon = [], round((LAT0) * Q), round((LON0) * Q)
     for la, lo in pts:
@@ -115,7 +120,41 @@ for e in base['elements']:
         river.append(enc(dp(g, 0.00004)))
     elif t.get('leisure') == 'park':
         if g[0] == g[-1]:
-            parks.append(enc(dp(g, 0.00002)))
+            parks.append(enc(dp_ring(g, 0.00002)))
+
+# edificios: altura de OpenStreetMap si la tiene; si no, una estimación (casas de 1 a 3 pisos)
+ALTURA_TIPO = {'university': 10, 'school': 7, 'college': 7, 'commercial': 9, 'retail': 7, 'office': 12,
+               'apartments': 12, 'hotel': 14, 'hospital': 14, 'church': 12, 'cathedral': 24, 'public': 9,
+               'government': 10, 'industrial': 8, 'warehouse': 7, 'roof': 4, 'garage': 3}
+
+def numero(v):
+    try:
+        return float(str(v).split()[0].replace(',', '.'))
+    except (TypeError, ValueError, IndexError):
+        return None
+
+def altura(t, oid):
+    h = numero(t.get('height'))
+    if h and 2 < h < 150:
+        return h
+    pisos = numero(t.get('building:levels'))
+    if pisos and 0 < pisos < 40:
+        return pisos * 3.2 + 0.8
+    if t.get('building') in ALTURA_TIPO:
+        return ALTURA_TIPO[t['building']]
+    r = (oid * 2654435761 % 1000) / 1000     # pseudoaleatorio, pero siempre igual para el mismo edificio
+    return 3.4 + (3.2 if r > 0.5 else 0) + (3.2 if r > 0.88 else 0)
+
+buildings = []
+if os.path.exists('edificios.json'):
+    for e in json.load(open('edificios.json', encoding='utf-8'))['elements']:
+        g = [(p['lat'], p['lon']) for p in e.get('geometry', [])]
+        if len(g) < 4 or g[0] != g[-1]:
+            continue
+        ring = dp_ring(g, 0.000006)
+        if len(ring) < 4:
+            continue
+        buildings.append([round(altura(e['tags'], e['id']) * 10)] + enc(ring))
 
 # etiquetas para avenidas principales: punto medio del tramo más largo
 labels = []
@@ -138,8 +177,8 @@ data = {
     'origin': [LAT0, LON0], 'q': Q,
     'route': enc(coords), 'total': round(total, 1),
     'stops': stops, 'streets': streets,
-    'roads': roads, 'river': river, 'parks': parks, 'labels': labels,
+    'roads': roads, 'river': river, 'parks': parks, 'labels': labels, 'buildings': buildings,
 }
 js = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
-print('ruta', round(total), 'm,', len(coords), 'puntos; calles', len(roads), '; json', len(js) // 1024, 'KB; etiquetas', len(labels))
+print('ruta', round(total), 'm,', len(coords), 'puntos; calles', len(roads), '; edificios', len(buildings), '; json', len(js) // 1024, 'KB; etiquetas', len(labels))
 open('data.json', 'w', encoding='utf-8').write(js)

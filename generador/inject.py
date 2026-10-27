@@ -5,7 +5,7 @@
 import json, os
 os.chdir(os.path.dirname(os.path.abspath(__file__)))   # rutas relativas a esta carpeta
 t = open('template.html', encoding='utf-8').read()
-t = t.replace('/*__LEAFLET_CSS__*/', open('leaflet.css', encoding='utf-8').read())
+t = t.replace('/*__MAPLIBRE_CSS__*/', open('maplibre-gl.css', encoding='utf-8').read())
 data = open('data.json', encoding='utf-8').read()
 t = t.replace('/*__DATA__*/null', data)
 

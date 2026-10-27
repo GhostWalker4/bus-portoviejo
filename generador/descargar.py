@@ -1,6 +1,7 @@
 """Descarga de OpenStreetMap los datos que usa el generador.
 
     python descargar.py mapa   calles, río y parques del centro de Portoviejo -> base.json
+    python descargar.py edificios   huellas de los edificios (con pisos o altura si los tienen) -> edificios.json
     python descargar.py ruta   trazado por calles que une las paradas de stops_snapped.json -> route.json
 
 Usa los servicios públicos de Overpass y OSRM: úsalos con moderación.
@@ -38,6 +39,13 @@ def mapa():
     print('base.json:', len(json.loads(datos)['elements']), 'elementos')
 
 
+def edificios():
+    q = f'[out:json][timeout:120];way["building"]({",".join(map(str, ZONA))});out geom tags;'
+    datos = pedir('https://overpass-api.de/api/interpreter', urlencode({'data': q}).encode())
+    open('edificios.json', 'wb').write(datos)
+    print('edificios.json:', len(json.loads(datos)['elements']), 'edificios')
+
+
 def ruta():
     paradas = json.load(open('stops_snapped.json', encoding='utf-8'))
     puntos = paradas + [paradas[0]]          # la línea es circular: vuelve a la primera parada
@@ -51,7 +59,7 @@ def ruta():
 
 
 if __name__ == '__main__':
-    acciones = {'mapa': mapa, 'ruta': ruta}
+    acciones = {'mapa': mapa, 'edificios': edificios, 'ruta': ruta}
     if len(sys.argv) != 2 or sys.argv[1] not in acciones:
         sys.exit(__doc__)
     acciones[sys.argv[1]]()

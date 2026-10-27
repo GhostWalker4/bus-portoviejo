@@ -7,7 +7,7 @@ __pycache__/
 
 # Pruebas locales y configuración de cada persona
 prueba*.html
-.claude/settings.local.json
+.claude/
 .vscode/
 .DS_Store
 Thumbs.db
