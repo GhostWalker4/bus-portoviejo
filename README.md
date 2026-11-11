@@ -76,6 +76,8 @@ La app busca el servidor sola, en la misma IP de la computadora y el puerto 8000
 EXPO_PUBLIC_SERVIDOR_URL=http://192.168.1.50:8000
 ```
 
+¿Sin celular a mano? Con `npm run web` la app se abre en el navegador, en <http://localhost:8081>. Sirve para revisar rápido, pero lo que vale es cómo se ve en Android: el mapa de la fase 4 no va a funcionar en la versión web.
+
 Antes de subir cambios: `npm run typecheck`.
 
 ## Estado
