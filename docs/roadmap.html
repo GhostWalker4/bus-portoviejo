@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Roadmap Bus Portoviejo</title>
+<style>
+  /* Fuentes locales (Google Fonts, licencia OFL) para que el PDF salga igual sin internet */
+  @font-face { font-family: 'Bricolage Grotesque'; src: url('fuentes/bricolage-grotesque.woff2') format('woff2'); font-weight: 200 800; }
+  @font-face { font-family: 'Inter'; src: url('fuentes/inter.woff2') format('woff2'); font-weight: 100 900; }
+  :root {
+    --verde: #0E3B3A;
+    --verde-2: #165352;
+    --verde-claro: #DDEBE7;
+    --amarillo: #F5B700;
+    --amarillo-claro: #FFF1C7;
+    --coral: #E4573D;
+    --coral-claro: #FBE1DA;
+    --azul: #2F6FB3;
+    --azul-claro: #DCE8F5;
+    --crema: #FBF7EF;
+    --tinta: #1D2524;
+    --gris: #5C6967;
+    --linea: #E3DDD0;
+  }
+  @page { size: A4; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #888; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--tinta);
+    font-size: 9.6pt;
+    line-height: 1.45;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .page {
+    width: 210mm; height: 297mm;
+    background: var(--crema);
+    position: relative; overflow: hidden;
+    padding: 18mm 17mm 16mm;
+    page-break-after: always; break-after: page;
+    margin: 0 auto;
+  }
+  .page:last-child { page-break-after: auto; break-after: auto; }
+  h1, h2, h3, .display { font-family: 'Bricolage Grotesque', 'Inter', sans-serif; letter-spacing: -0.01em; }
+  h2 { font-size: 24pt; font-weight: 800; color: var(--verde); line-height: 1.05; }
+  h3 { font-size: 13pt; font-weight: 700; color: var(--verde); line-height: 1.15; }
+  .kicker {
+    font-size: 8pt; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--coral); margin-bottom: 5mm; display: flex; align-items: center; gap: 3mm;
+  }
+  .kicker::before { content: ''; width: 9mm; height: 2.4px; background: var(--coral); border-radius: 2px; }
+  p { margin-bottom: 2.4mm; }
+  .muted { color: var(--gris); }
+  strong { font-weight: 600; color: var(--verde); }
+
+  /* Pie de página */
+  .pie {
+    position: absolute; left: 17mm; right: 17mm; bottom: 8mm;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 7.5pt; color: var(--gris);
+    border-top: 1px solid var(--linea); padding-top: 2.5mm;
+  }
+  .pie .marca { display: flex; align-items: center; gap: 2mm; font-weight: 600; color: var(--verde); }
+  .pie .marca i { width: 3mm; height: 3mm; border-radius: 50%; background: var(--amarillo); border: 2px solid var(--verde); display: inline-block; }
+
+  /* ---------- PORTADA ---------- */
+  .portada { background: var(--verde); color: #fff; padding: 0; }
+  .portada svg.fondo { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .portada .contenido { position: absolute; left: 18mm; right: 18mm; top: 26mm; }
+  .portada .sello {
+    display: inline-flex; align-items: center; gap: 2.5mm;
+    background: var(--amarillo); color: var(--verde);
+    font-weight: 700; font-size: 8.5pt; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 2mm 4mm; border-radius: 20mm;
+  }
+  .portada h1 { font-size: 56pt; font-weight: 800; line-height: 0.92; margin-top: 9mm; letter-spacing: -0.03em; }
+  .portada h1 span { color: var(--amarillo); }
+  .portada .sub { font-size: 15pt; font-family: 'Bricolage Grotesque'; font-weight: 500; margin-top: 6mm; color: #CFE3DE; max-width: 140mm; line-height: 1.3; }
+  .portada .abajo {
+    position: absolute; left: 18mm; right: 18mm; bottom: 16mm;
+    display: flex; justify-content: space-between; align-items: flex-end;
+    font-size: 9pt; color: #CFE3DE;
+  }
+  .portada .abajo b { color: #fff; font-weight: 600; display: block; font-size: 10.5pt; }
+
+  /* ---------- LA IDEA ---------- */
+  .intro { font-size: 11pt; line-height: 1.45; color: var(--tinta); max-width: 165mm; margin: 4mm 0 6mm; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4mm; }
+  .caja { background: #fff; border-radius: 4mm; padding: 5mm 5.5mm; border: 1px solid var(--linea); }
+  .caja h3 { margin-bottom: 2.5mm; display: flex; align-items: center; gap: 2.5mm; }
+  .icono { width: 8mm; height: 8mm; border-radius: 2.5mm; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+  .icono svg { width: 4.6mm; height: 4.6mm; }
+  .i-coral { background: var(--coral-claro); color: var(--coral); }
+  .i-verde { background: var(--verde-claro); color: var(--verde); }
+  .i-amar { background: var(--amarillo-claro); color: #A77C00; }
+  .i-azul { background: var(--azul-claro); color: var(--azul); }
+  ul.lista { list-style: none; }
+  ul.lista li { position: relative; padding-left: 4.5mm; margin-bottom: 1.6mm; }
+  ul.lista li::before { content: ''; position: absolute; left: 0; top: 1.9mm; width: 1.8mm; height: 1.8mm; border-radius: 50%; background: var(--amarillo); }
+  .chips { display: flex; flex-wrap: wrap; gap: 2mm; }
+  .chip { background: var(--verde); color: #fff; border-radius: 10mm; padding: 1.2mm 3.4mm; font-size: 8.3pt; font-weight: 600; }
+  .chip.claro { background: var(--verde-claro); color: var(--verde); }
+  .meta {
+    margin-top: 4mm; background: var(--verde); color: #fff; border-radius: 4mm; padding: 5mm 7mm;
+    display: grid; grid-template-columns: 34mm 1fr; gap: 6mm; align-items: center;
+  }
+  .meta .display { font-size: 20pt; font-weight: 800; color: var(--amarillo); line-height: 1; }
+  .meta p { margin: 0; color: #E3F0EC; }
+  .meta strong { color: #fff; }
+  .valor { margin-top: 4mm; }
+  .valor .num { font-family: 'Bricolage Grotesque'; font-weight: 800; font-size: 20pt; color: var(--coral); line-height: 1; margin-bottom: 1.5mm; }
+  .valor .caja { padding: 4.5mm 5mm; }
+  .valor h4 { font-size: 10pt; color: var(--verde); margin-bottom: 1mm; }
+  .valor p { font-size: 8.8pt; color: var(--gris); margin: 0; }
+
+  /* ---------- EL RECORRIDO ---------- */
+  .ruta { position: relative; margin-top: 7mm; padding-left: 2mm; }
+  .ruta::before { content: ''; position: absolute; left: 8.5mm; top: 5mm; bottom: 9mm; width: 3.2mm; background: var(--verde); border-radius: 2mm; }
+  .parada { position: relative; display: grid; grid-template-columns: 16mm 1fr 30mm; gap: 3mm; align-items: center; min-height: 18.2mm; }
+  .parada .punto {
+    width: 16mm; height: 16mm; border-radius: 50%; background: #fff; border: 3.2px solid var(--verde);
+    display: flex; align-items: center; justify-content: center; position: relative; z-index: 1;
+    font-family: 'Bricolage Grotesque'; font-weight: 800; font-size: 15pt; color: var(--verde);
+  }
+  .parada.final .punto { background: var(--amarillo); }
+  .parada.campo .punto { border-color: var(--coral); color: var(--coral); }
+  .parada .txt b { font-family: 'Bricolage Grotesque'; font-size: 12pt; font-weight: 700; color: var(--verde); display: block; line-height: 1.15; }
+  .parada .txt span { color: var(--gris); font-size: 8.8pt; }
+  .tag { font-size: 7.3pt; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 1mm 2.6mm; border-radius: 10mm; justify-self: end; white-space: nowrap; }
+  .t-prog { background: var(--verde-claro); color: var(--verde); }
+  .t-campo { background: var(--coral-claro); color: var(--coral); }
+  .t-pres { background: var(--azul-claro); color: var(--azul); }
+  .t-todos { background: var(--amarillo-claro); color: #8A6600; }
+  .paralelo {
+    position: absolute; right: 34mm; top: 21mm; height: 70mm; width: 0;
+    border-right: 2.4px dashed var(--coral);
+  }
+  .paralelo span {
+    position: absolute; right: 2.5mm; top: 50%; transform: translateY(-50%);
+    font-size: 7.3pt; font-weight: 700; color: var(--coral); text-align: right; width: 34mm; line-height: 1.3;
+  }
+  .leyenda { display: flex; gap: 3mm; flex-wrap: wrap; margin-top: 3mm; align-items: center; font-size: 8.3pt; color: var(--gris); }
+  .prioridad { margin-top: 5mm; background: #fff; border: 1px solid var(--linea); border-radius: 4mm; padding: 4mm 5mm; display: flex; align-items: center; gap: 1.8mm; flex-wrap: wrap; font-size: 8.4pt; }
+  .prioridad b { color: var(--verde); }
+  .prioridad .flecha { color: var(--coral); font-weight: 700; }
+  .prioridad .p { background: var(--verde-claro); color: var(--verde); border-radius: 10mm; padding: 1mm 3mm; font-weight: 600; }
+
+  /* ---------- FASES ---------- */
+  .fase { background: #fff; border-radius: 4mm; border: 1px solid var(--linea); padding: 5mm 6mm 4.5mm; margin-bottom: 4.5mm; position: relative; overflow: hidden; }
+  .fase::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2mm; background: var(--verde); }
+  .fase.campo::before { background: var(--coral); }
+  .fase.pres::before { background: var(--azul); }
+  .fase.todos::before { background: var(--amarillo); }
+  .fase .cab { display: flex; align-items: center; gap: 3.5mm; margin-bottom: 3mm; }
+  .fase .n {
+    width: 11mm; height: 11mm; border-radius: 50%; border: 2.6px solid var(--verde); flex: none;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Bricolage Grotesque'; font-weight: 800; font-size: 12pt; color: var(--verde);
+  }
+  .fase.campo .n { border-color: var(--coral); color: var(--coral); }
+  .fase.pres .n { border-color: var(--azul); color: var(--azul); }
+  .fase.todos .n { border-color: #C79400; color: #8A6600; background: var(--amarillo-claro); }
+  .fase .cab h3 { flex: 1; font-size: 14pt; }
+  .fase .cab .sub { display: block; font-family: 'Inter'; font-size: 8.5pt; font-weight: 400; color: var(--gris); margin-top: 0.6mm; letter-spacing: 0; }
+  ul.check { list-style: none; columns: 1; }
+  ul.check li { position: relative; padding-left: 6mm; margin-bottom: 1.5mm; font-size: 9pt; break-inside: avoid; }
+  ul.check li::before { content: ''; position: absolute; left: 0; top: 0.7mm; width: 3.2mm; height: 3.2mm; border: 1.6px solid #A9B5B2; border-radius: 1mm; background: #fff; }
+  ul.check.dos { columns: 2; column-gap: 7mm; }
+  .listo { margin-top: 2.6mm; background: var(--verde-claro); border-radius: 2.5mm; padding: 2.2mm 3.5mm; font-size: 8.7pt; color: var(--verde); }
+  .listo b, .nota b { white-space: nowrap; margin-right: 1.2mm; }
+  .nota { margin-top: 2.4mm; border-radius: 2.5mm; padding: 2.2mm 3.5mm; font-size: 8.6pt; }
+  .nota.aviso { background: var(--amarillo-claro); color: #6E5200; }
+  .nota.aviso b { color: #6E5200; white-space: nowrap; }
+  .nota.alerta { background: var(--coral-claro); color: #8C2D1C; }
+  .nota.alerta b { color: #8C2D1C; white-space: nowrap; }
+  code { font-family: 'Consolas', ui-monospace, monospace; font-size: 8.3pt; background: #F1ECE1; padding: 0.2mm 1.2mm; border-radius: 1mm; color: var(--verde-2); }
+  .cabecera-pag { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 6mm; }
+  .cabecera-pag .rango { font-family: 'Bricolage Grotesque'; font-weight: 800; font-size: 34pt; color: var(--linea); line-height: 0.8; }
+
+  /* ---------- SÚBETE ---------- */
+  .rol { background: #fff; border-radius: 4mm; border: 1px solid var(--linea); padding: 5mm; border-top: 2.4mm solid var(--verde); }
+  .rol.campo { border-top-color: var(--coral); }
+  .rol.pres { border-top-color: var(--azul); }
+  .rol h3 { font-size: 12.5pt; margin-bottom: 1mm; }
+  .rol .q { font-size: 8.5pt; color: var(--gris); margin-bottom: 3mm; min-height: 9mm; }
+  .rol ol { padding-left: 4.2mm; font-size: 8.8pt; }
+  .rol ol li { margin-bottom: 1.4mm; padding-left: 0.8mm; }
+  .rol .sin { margin-top: 3mm; font-size: 7.8pt; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+  .rol.campo .sin { color: var(--coral); }
+  .rol.pres .sin { color: var(--azul); }
+  .rol .sin { color: var(--verde); }
+  .riesgos { display: grid; grid-template-columns: 1fr 1fr; gap: 3.5mm; }
+  .riesgo { background: #fff; border-radius: 3mm; border: 1px solid var(--linea); padding: 3.8mm 4.5mm; }
+  .riesgo h4 { font-size: 9.8pt; color: var(--coral); margin-bottom: 1mm; font-family: 'Bricolage Grotesque'; font-weight: 700; }
+  .riesgo p { font-size: 8.6pt; color: var(--gris); margin: 0; }
+  .reglas { margin-top: 4mm; display: flex; gap: 3mm; }
+  .regla { flex: 1; background: var(--verde-claro); border-radius: 3mm; padding: 3.2mm 4mm; font-size: 8.6pt; color: var(--verde); }
+  .cta {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 52mm; background: var(--verde); color: #fff;
+    padding: 9mm 17mm; overflow: hidden;
+  }
+  .cta svg { position: absolute; right: -8mm; bottom: -2mm; width: 120mm; }
+  .cta .display { font-size: 27pt; font-weight: 800; line-height: 1; color: var(--amarillo); }
+  .cta p { margin-top: 3mm; color: #D6E8E3; max-width: 100mm; font-size: 10pt; }
+</style>
+</head>
+<body>
+
+<!-- ======================= 1. PORTADA ======================= -->
+<section class="page portada">
+  <svg class="fondo" viewBox="0 0 210 297" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <pattern id="cuadras" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(-12)">
+        <path d="M14 0H0V14" fill="none" stroke="#1C5554" stroke-width="0.35"/>
+      </pattern>
+    </defs>
+    <rect width="210" height="297" fill="url(#cuadras)" opacity="0.9"/>
+    <!-- río -->
+    <path d="M-10 228 C40 214 70 246 120 232 S190 214 230 226" fill="none" stroke="#1E6A69" stroke-width="7" opacity="0.55" stroke-linecap="round"/>
+    <!-- línea secundaria -->
+    <path d="M-5 150 C30 160 50 128 85 140 S150 190 215 168" fill="none" stroke="#E4573D" stroke-width="2.2" stroke-dasharray="1 3.2" stroke-linecap="round" opacity="0.9"/>
+    <!-- línea principal -->
+    <path id="ruta" d="M-6 268 C26 262 30 232 56 222 S96 214 108 190 S120 150 150 146 S196 132 216 104" fill="none" stroke="#F5B700" stroke-width="3.4" stroke-linecap="round"/>
+    <g fill="#0E3B3A" stroke="#F5B700" stroke-width="1.6">
+      <circle cx="30" cy="248" r="3.2"/>
+      <circle cx="74" cy="216" r="3.2"/>
+      <circle cx="108" cy="190" r="3.2"/>
+      <circle cx="150" cy="146" r="3.2"/>
+      <circle cx="190" cy="126" r="3.2"/>
+    </g>
+    <g fill="#0E3B3A" stroke="#E4573D" stroke-width="1.4">
+      <circle cx="44" cy="146" r="2.4"/>
+      <circle cx="122" cy="163" r="2.4"/>
+    </g>
+    <!-- bus -->
+    <g transform="translate(118 162) rotate(-38)">
+      <rect x="-15" y="-7.5" width="30" height="15" rx="3.2" fill="#F5B700"/>
+      <rect x="-15" y="-7.5" width="30" height="4" rx="2" fill="#FFD24D"/>
+      <g fill="#0E3B3A">
+        <rect x="-12" y="-2.8" width="5" height="4.6" rx="0.9"/>
+        <rect x="-5.6" y="-2.8" width="5" height="4.6" rx="0.9"/>
+        <rect x="0.8" y="-2.8" width="5" height="4.6" rx="0.9"/>
+        <rect x="7.4" y="-2.8" width="5.4" height="4.6" rx="0.9"/>
+        <circle cx="-8" cy="7.6" r="2.6"/>
+        <circle cx="8" cy="7.6" r="2.6"/>
+      </g>
+      <circle cx="-8" cy="7.6" r="1" fill="#F5B700"/>
+      <circle cx="8" cy="7.6" r="1" fill="#F5B700"/>
+    </g>
+    <!-- señal en vivo -->
+    <g transform="translate(150 146)" fill="none" stroke="#F5B700" stroke-linecap="round">
+      <path d="M-7 -9 A11 11 0 0 1 7 -9" stroke-width="1.2" opacity="0.9"/>
+      <path d="M-11 -13 A16 16 0 0 1 11 -13" stroke-width="1" opacity="0.55"/>
+    </g>
+  </svg>
+  <div class="contenido">
+    <span class="sello">Roadmap del proyecto</span>
+    <h1>Bus<br><span>Portoviejo</span></h1>
+    <p class="sub">Del prototipo a una app para la ciudad: saber dónde viene tu bus y si te da tiempo de llegar a la parada.</p>
+  </div>
+  <div class="abajo">
+    <div><b>Manabí, Ecuador</b>Noviembre de 2026 · Documento para el equipo</div>
+    <div style="text-align:right"><b>App Android</b>React Native · Django · MapLibre</div>
+  </div>
+</section>
+
+<!-- ======================= 2. LA IDEA ======================= -->
+<section class="page">
+  <div class="kicker">La idea en una página</div>
+  <h2>Que esperar el bus deje<br>de ser adivinar.</h2>
+  <p class="intro">Hoy en Portoviejo nadie sabe cuánto falta para que pase el bus: se sale de casa a ciegas y se espera en la parada sin saber si ya pasó. <strong>Bus Portoviejo</strong> muestra los buses urbanos en el mapa en tiempo real y te dice si te da tiempo o si tienes que correr.</p>
+
+  <div class="grid2">
+    <div class="caja">
+      <h3><span class="icono i-coral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>Qué hará la app</h3>
+      <ul class="lista">
+        <li><strong>Buses en vivo:</strong> ver en el mapa dónde va el bus de tu línea.</li>
+        <li><strong>Tiempo de llegada:</strong> cuánto falta y un aviso <em>Tranquilo / Sal ya / No llegas</em>.</li>
+        <li><strong>Viaje A → B:</strong> qué línea tomar, incluso con un transbordo.</li>
+        <li><strong>Avisos:</strong> una notificación cuando tu bus está cerca.</li>
+      </ul>
+    </div>
+    <div class="caja">
+      <h3><span class="icono i-verde"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20l-6-3V4l6 3 6-3 6 3v13l-6-3-6 3z"/><path d="M9 7v13M15 4v13"/></svg></span>Lo que ya existe</h3>
+      <ul class="lista">
+        <li>Una demo con el <strong>mapa real de Portoviejo</strong> en vista isométrica, con 7.600 edificios en 3D.</li>
+        <li>Una línea de ejemplo con 10 paradas, 3 buses simulados y el cálculo de llegada.</li>
+        <li>Una prueba en vivo con un celular haciendo de GPS.</li>
+      </ul>
+      <p class="muted" style="font-size:8.5pt;margin:2mm 0 0">La línea de ejemplo no existe. El siguiente paso es usar líneas reales.</p>
+    </div>
+  </div>
+
+  <div class="meta">
+    <div class="display">La meta</div>
+    <p>Una <strong>app Android instalable</strong> con <strong>2 o 3 líneas reales</strong>, buses simulados moviéndose en vivo, tiempo de llegada, viaje A→B y avisos, más un panel web para administrar líneas y paradas. Con eso se va a presentar el proyecto a <strong>las autoridades y las cooperativas</strong>, junto con un plan piloto. Si lo financian, ellos ponen los GPS físicos en los buses.</p>
+  </div>
+
+  <div class="caja" style="margin-top:4mm">
+    <h3><span class="icono i-azul"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></span>Con qué se construye</h3>
+    <div class="chips">
+      <span class="chip">React Native + Expo</span>
+      <span class="chip">Django</span>
+      <span class="chip">Django Channels · WebSockets</span>
+      <span class="chip">MapLibre</span>
+      <span class="chip claro">Android primero</span>
+      <span class="chip claro">Servicios gratuitos para la demo</span>
+      <span class="chip claro">Datos en GTFS</span>
+    </div>
+  </div>
+
+  <div class="valor">
+    <h3 style="margin-bottom:3mm">Por qué vale la pena</h3>
+    <div class="grid3">
+      <div class="caja"><div class="num">01</div><h4>Un problema de todos los días</h4><p>Cualquiera que tome bus en Portoviejo lo entiende en cinco segundos.</p></div>
+      <div class="caja"><div class="num">02</div><h4>Ya hay algo que mostrar</h4><p>Un mapa que funciona convence más que una idea en una diapositiva.</p></div>
+      <div class="caja"><div class="num">03</div><h4>Sin gastar en hardware</h4><p>Primero se demuestra con simulación. Los GPS los pone quien financie.</p></div>
+    </div>
+  </div>
+
+  <div class="pie"><span class="marca"><i></i>Bus Portoviejo · Roadmap</span><span>2</span></div>
+</section>
+
+<!-- ======================= 3. EL RECORRIDO ======================= -->
+<section class="page">
+  <div class="kicker">El recorrido completo</div>
+  <h2>Diez paradas hasta la ciudad</h2>
+  <p class="muted" style="margin-top:3mm;max-width:150mm">Cada fase es una parada. No hay fechas fijas: se avanza en orden y no se empieza una fase sin terminar la anterior. Solo el trabajo de campo va en paralelo.</p>
+
+  <div class="ruta">
+    <div class="paralelo"><span>El trabajo de campo sigue mientras se programan las fases 2 a 4</span></div>
+    <div class="parada"><div class="punto">0</div><div class="txt"><b>Preparar el terreno</b><span>Herramientas, repositorio nuevo y tablero de tareas.</span></div><span class="tag t-prog">Programación</span></div>
+    <div class="parada campo"><div class="punto">1</div><div class="txt"><b>Datos reales de 2 o 3 líneas</b><span>Viajar en bus grabando el recorrido y anotando las paradas.</span></div><span class="tag t-campo">Campo</span></div>
+    <div class="parada"><div class="punto">2</div><div class="txt"><b>Servidor Django</b><span>Líneas, paradas, panel de administración y API.</span></div><span class="tag t-prog">Programación</span></div>
+    <div class="parada"><div class="punto">3</div><div class="txt"><b>Simulación en tiempo real</b><span>Buses ficticios sobre recorridos reales, enviados por WebSocket.</span></div><span class="tag t-prog">Programación</span></div>
+    <div class="parada"><div class="punto">4</div><div class="txt"><b>La app con el mapa</b><span>Expo + MapLibre: ver los buses moverse en un Android.</span></div><span class="tag t-prog">Programación</span></div>
+    <div class="parada"><div class="punto">5</div><div class="txt"><b>Tiempo de llegada</b><span>“Llega en 6 min”, más Tranquilo / Sal ya / No llegas.</span></div><span class="tag t-prog">Programación</span></div>
+    <div class="parada"><div class="punto">6</div><div class="txt"><b>Viaje A → B</b><span>Qué línea tomar, directa o con un transbordo.</span></div><span class="tag t-prog">Programación</span></div>
+    <div class="parada"><div class="punto">7</div><div class="txt"><b>Avisos</b><span>Notificación cuando el bus está cerca de tu parada.</span></div><span class="tag t-prog">Programación</span></div>
+    <div class="parada"><div class="punto" style="border-color:var(--azul);color:var(--azul)">8</div><div class="txt"><b>Presentación a las autoridades</b><span>APK, video, documento y plan piloto con costos.</span></div><span class="tag t-pres">Presentación</span></div>
+    <div class="parada final"><div class="punto">9</div><div class="txt"><b>GPS reales en los buses</b><span>Solo si hay financiamiento: hardware, seguridad y Play Store.</span></div><span class="tag t-todos">Todos</span></div>
+  </div>
+
+  <div class="prioridad">
+    <b>Si el tiempo aprieta, este es el orden:</b>
+    <span class="p">Buses en vivo</span><span class="flecha">→</span>
+    <span class="p">Tiempo de llegada</span><span class="flecha">→</span>
+    <span class="p">Viaje A→B</span><span class="flecha">→</span>
+    <span class="p">Avisos</span>
+    <span class="muted" style="width:100%;font-size:8.3pt">Con las dos primeras ya hay una demo que se puede presentar.</span>
+  </div>
+
+  <div class="pie"><span class="marca"><i></i>Bus Portoviejo · Roadmap</span><span>3</span></div>
+</section>
+
+<!-- ======================= 4. FASES 0–1 ======================= -->
+<section class="page">
+  <div class="cabecera-pag"><div><div class="kicker">Paradas 0 y 1</div><h2>Preparar y salir a la calle</h2></div><div class="rango">0–1</div></div>
+
+  <div class="fase">
+    <div class="cab"><div class="n">0</div><h3>Preparar el terreno<span class="sub">Dejar todo listo para que cualquiera pueda empezar a trabajar.</span></h3><span class="tag t-prog">Programación</span></div>
+    <ul class="check">
+      <li>Antes de borrar el prototipo web, marcarlo con una etiqueta (<code>git tag prototipo-web</code>). Su lógica de llegadas y sus scripts sirven de referencia.</li>
+      <li>Reorganizar el repositorio en dos carpetas: <code>movil/</code> (Expo) y <code>servidor/</code> (Django).</li>
+      <li>Instalar Node.js LTS, Python 3, Git y Android Studio (para el emulador y para compilar).</li>
+      <li>Elegir una licencia, por ejemplo MIT, o dejarlo privado si se piensa licenciar al municipio.</li>
+      <li>Crear un tablero en GitHub (<em>Projects</em>) y pasar cada tarea a un <em>Issue</em>, para que quien se sume tome una tarea sin preguntar.</li>
+    </ul>
+    <div class="listo"><b>Listo cuando:</b> Expo y Django arrancan en tu computadora y el repositorio tiene la estructura nueva.</div>
+  </div>
+
+  <div class="fase campo">
+    <div class="cab"><div class="n">1</div><h3>Datos reales de 2 o 3 líneas<span class="sub">Es la base de todo: sin recorridos reales, la demo no convence.</span></h3><span class="tag t-campo">Campo</span></div>
+    <ul class="check">
+      <li>Elegir 2 o 3 líneas que <strong>se crucen</strong> entre sí (para que el viaje A→B tenga transbordos) y que una de ellas pase por la UTM.</li>
+      <li>Viajar en cada línea, ida y vuelta, grabando con <strong>GPSLogger</strong> (Android, gratis). Guarda el recorrido en el celular como GPX y no necesita servidor.</li>
+      <li>Anotar cada parada: nombre, lado de la calle y una foto.</li>
+      <li>Repetir cada línea en 2 o 3 horarios (mañana, mediodía, hora pico) para tener tiempos reales por tramo.</li>
+      <li>Anotar la frecuencia aproximada (cada cuántos minutos pasa un bus) y el horario de servicio.</li>
+      <li>Pasar todo a <strong>GTFS</strong>, el estándar mundial de transporte público. Da buena impresión ante las autoridades y, más adelante, permite que la ciudad aparezca en Google Maps o Moovit por las vías oficiales.</li>
+    </ul>
+    <div class="nota alerta"><b>Ojo:</b> Google Maps sirve para orientarse, pero sus datos no se pueden copiar: sus términos lo prohíben. Las paradas tienen que salir de la grabación o de la libreta.</div>
+    <div class="nota aviso"><b>Privacidad:</b> un archivo GPX dice dónde estuvo una persona. Antes de subirlo, recorta los tramos cercanos a casas.</div>
+    <div class="listo"><b>Listo cuando:</b> hay trazado, paradas y tiempos por tramo de 2 o 3 líneas, en GTFS dentro de <code>datos/</code>.</div>
+  </div>
+
+  <div class="pie"><span class="marca"><i></i>Bus Portoviejo · Roadmap</span><span>4</span></div>
+</section>
+
+<!-- ======================= 5. FASES 2–4 ======================= -->
+<section class="page">
+  <div class="cabecera-pag"><div><div class="kicker">Paradas 2, 3 y 4</div><h2>El motor y el mapa</h2></div><div class="rango">2–4</div></div>
+
+  <div class="fase">
+    <div class="cab"><div class="n">2</div><h3>Servidor Django<span class="sub">La base de datos de líneas y paradas, con un panel para editarlas.</span></h3><span class="tag t-prog">Programación</span></div>
+    <ul class="check">
+      <li>Modelos: <code>Linea</code>, <code>Parada</code>, <code>Trazado</code>, <code>ParadaEnLinea</code> (orden y tiempo por tramo) y <code>Bus</code>.</li>
+      <li>Activar el <strong>panel de administración de Django</strong> para crear y editar líneas sin programar. Conviene mostrárselo a las autoridades.</li>
+      <li>Un comando <code>importar_gtfs</code> que cargue los datos de la fase 1.</li>
+      <li>Una API con Django REST Framework: <code>/api/lineas</code>, sus paradas y su trazado.</li>
+      <li>Publicarlo gratis (Render, Koyeb o PythonAnywhere). En la mayoría el servidor “se duerme”: hay que despertarlo antes de cada demo.</li>
+    </ul>
+    <div class="listo"><b>Listo cuando:</b> abres la API desde el celular y devuelve las líneas reales.</div>
+  </div>
+
+  <div class="fase">
+    <div class="cab"><div class="n">3</div><h3>Simulación en tiempo real<span class="sub">Buses ficticios que se mueven como los de verdad.</span></h3><span class="tag t-prog">Programación</span></div>
+    <ul class="check">
+      <li>Un simulador que haga salir buses según la frecuencia de cada línea y los mueva por el trazado real con las velocidades medidas.</li>
+      <li>Variaciones realistas: buses más rápidos o más lentos, esperas distintas en las paradas y “tráfico” en hora pico.</li>
+      <li>Un canal WebSocket por línea (<code>/ws/lineas/&lt;id&gt;/</code>) que envíe las posiciones cada 2 a 5 segundos.</li>
+      <li>Para la demo basta la capa en memoria de Channels, sin Redis. Redis llega en la fase 9.</li>
+      <li>Usar para el mensaje la misma forma que tendrá el GPS real (<code>bus, lat, lon, velocidad, rumbo, hora</code>). Así, cuando haya GPS físicos, la app no se toca.</li>
+    </ul>
+    <div class="listo"><b>Listo cuando:</b> un cliente WebSocket de prueba recibe los buses simulados en movimiento.</div>
+  </div>
+
+  <div class="fase">
+    <div class="cab"><div class="n">4</div><h3>La app con el mapa<span class="sub">El primer momento en que se ve en un celular.</span></h3><span class="tag t-prog">Programación</span></div>
+    <ul class="check">
+      <li>Crear la app con Expo y TypeScript, y agregar <code>@maplibre/maplibre-react-native</code>.</li>
+      <li>Ese paquete <strong>no corre en Expo Go</strong>: hace falta un <em>development build</em> (<code>npx expo run:android</code>). Es la primera traba esperable; no es un error tuyo.</li>
+      <li>Mapa base gratuito (por ejemplo, OpenFreeMap, sin clave y con edificios). La vista 3D se recupera con <code>fill-extrusion</code>.</li>
+      <li>Pantallas: lista de líneas → mapa de la línea → buses en vivo. Mostrar “Sin conexión” y reconectar solo.</li>
+    </ul>
+    <div class="listo"><b>Listo cuando:</b> en un Android real ves los buses simulados moverse sobre las líneas reales.</div>
+  </div>
+
+  <div class="pie"><span class="marca"><i></i>Bus Portoviejo · Roadmap</span><span>5</span></div>
+</section>
+
+<!-- ======================= 6. FASES 5–7 ======================= -->
+<section class="page">
+  <div class="cabecera-pag"><div><div class="kicker">Paradas 5, 6 y 7</div><h2>Lo que la gente va a usar</h2></div><div class="rango">5–7</div></div>
+
+  <div class="fase">
+    <div class="cab"><div class="n">5</div><h3>Tiempo de llegada<span class="sub">La función estrella: cuánto falta y si te da tiempo.</span></h3><span class="tag t-prog">Programación</span></div>
+    <ul class="check">
+      <li>El servidor calcula cuánto le falta a cada bus para llegar a las paradas siguientes: la distancia sobre el trazado dividida por la velocidad del tramo, más las esperas.</li>
+      <li>En la app: tocas una parada y ves “llega en X min”, además de <strong>Tranquilo / Sal ya / No llegas</strong> según lo que tardas caminando (con <code>expo-location</code>).</li>
+      <li>Guardar paradas favoritas en el celular.</li>
+    </ul>
+    <div class="listo"><b>Listo cuando:</b> la llegada mostrada coincide con lo que hace el simulador.</div>
+  </div>
+
+  <div class="fase">
+    <div class="cab"><div class="n">6</div><h3>Viaje A → B<span class="sub">Decirle a la gente qué bus tomar.</span></h3><span class="tag t-prog">Programación</span></div>
+    <ul class="check">
+      <li>El usuario elige origen y destino tocando el mapa o con su ubicación actual.</li>
+      <li>Con 2 o 3 líneas basta un método simple: paradas a menos de unos 500 m a pie del origen y del destino, primero las líneas directas y después las combinaciones con <strong>un transbordo</strong>.</li>
+      <li>Ordenar las opciones por hora de llegada usando los tiempos en vivo.</li>
+      <li>Más adelante, con muchas líneas, pasar a OpenTripPlanner, que lee GTFS directamente.</li>
+    </ul>
+    <div class="listo"><b>Listo cuando:</b> de la UTM al centro, la app propone la mejor opción con su hora de llegada.</div>
+  </div>
+
+  <div class="fase">
+    <div class="cab"><div class="n">7</div><h3>Avisos<span class="sub">Que el celular te avise, sin estar mirando el mapa.</span></h3><span class="tag t-prog">Programación</span></div>
+    <ul class="check">
+      <li>Primero, avisos <strong>locales</strong> con <code>expo-notifications</code>: “Tu bus está a 3 minutos de la parada”.</li>
+      <li>Después, avisos <strong>push</strong> enviados por el servidor aunque la app esté cerrada. Es lo más difícil: requiere Firebase Cloud Messaging y un servidor siempre despierto, algo que los planes gratuitos no garantizan.</li>
+    </ul>
+    <div class="nota aviso"><b>Para la demo:</b> alcanza con los avisos locales. Los push quedan para cuando haya presupuesto.</div>
+  </div>
+
+  <div class="pie"><span class="marca"><i></i>Bus Portoviejo · Roadmap</span><span>6</span></div>
+</section>
+
+<!-- ======================= 7. FASES 8–9 ======================= -->
+<section class="page">
+  <div class="cabecera-pag"><div><div class="kicker">Paradas 8 y 9</div><h2>Presentarlo y hacerlo real</h2></div><div class="rango">8–9</div></div>
+
+  <div class="fase pres">
+    <div class="cab"><div class="n">8</div><h3>Presentación a las autoridades<span class="sub">Ideal para quien prefiere la parte no técnica.</span></h3><span class="tag t-pres">Presentación</span></div>
+    <ul class="check">
+      <li>Generar el APK con EAS Build (tiene plan gratuito) e instalarlo en 2 o 3 celulares para la reunión.</li>
+      <li>Grabar un video corto de la app funcionando, por si falla el internet en la sala.</li>
+      <li>Documento y diapositivas con el problema (cuánto espera hoy un pasajero), la solución, la demo y un <strong>plan piloto</strong>: una línea, cuántos buses, el costo de cada GPS con su chip de datos y el costo mensual del servidor.</li>
+      <li>Llevar los <strong>datos GTFS</strong> de las líneas levantadas. Son un valor real para el municipio aunque no compren la app.</li>
+      <li>Usar el contacto informal para conseguir la reunión con la dirección de movilidad o la ATM, y averiguar antes si las cooperativas ya tienen rastreadores.</li>
+    </ul>
+    <div class="listo" style="background:var(--azul-claro);color:var(--azul)"><b>Listo cuando:</b> se hizo la presentación y hay una respuesta: sí, no o “vuelvan con X”.</div>
+  </div>
+
+  <div class="fase todos">
+    <div class="cab"><div class="n">9</div><h3>GPS reales en los buses<span class="sub">Solo si hay financiamiento o un piloto aprobado.</span></h3><span class="tag t-todos">Todos</span></div>
+    <ul class="check">
+      <li>Poner <strong>Traccar Server</strong> como puerta de entrada de los GPS físicos: entiende más de 200 protocolos (Teltonika, Concox…). Django lee de Traccar y reemplaza al simulador sin tocar la app.</li>
+      <li>Seguridad: autenticación de los dispositivos, HTTPS y límites de uso.</li>
+      <li>Redis para Channels y un servidor que no se duerma (para entonces ya habría presupuesto).</li>
+      <li>Medir en la calle la diferencia entre la llegada estimada y la real, y ajustar.</li>
+      <li>Publicar en Play Store (pago único de 25 USD) y después en iPhone (Apple Developer, 99 USD al año).</li>
+      <li>Ampliar a todas las líneas de la ciudad.</li>
+    </ul>
+  </div>
+
+  <div class="caja" style="display:flex;gap:5mm;align-items:center">
+    <span class="icono i-amar" style="width:12mm;height:12mm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:6.5mm;height:6.5mm"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></span>
+    <p style="margin:0">El mensaje de posición se diseña desde la fase 3 con la misma forma que mandará el GPS real. Por eso, pasar de la simulación a los buses de verdad es <strong>cambiar de dónde vienen los datos</strong>, no rehacer la app.</p>
+  </div>
+
+  <div class="pie"><span class="marca"><i></i>Bus Portoviejo · Roadmap</span><span>7</span></div>
+</section>
+
+<!-- ======================= 8. SÚBETE ======================= -->
+<section class="page">
+  <div class="kicker">Para sumarse al proyecto</div>
+  <h2>¿Te subes?</h2>
+  <p class="muted" style="margin:3mm 0 6mm;max-width:150mm">No hace falta saber programar. Hay tres formas de ayudar y cada una tiene un primer paso claro.</p>
+
+  <div class="grid3">
+    <div class="rol campo">
+      <h3>Trabajo de campo</h3>
+      <p class="q">Te gusta moverte por la ciudad y no te molesta viajar en bus.</p>
+      <ol>
+        <li>Instala GPSLogger en tu Android.</li>
+        <li>Elige una de las líneas del proyecto.</li>
+        <li>Haz el recorrido de ida y vuelta grabando.</li>
+        <li>Anota y fotografía cada parada.</li>
+      </ol>
+      <div class="sin">Fase 1 · Sin programar</div>
+    </div>
+    <div class="rol pres">
+      <h3>Presentación</h3>
+      <p class="q">Te va bien hablar, escribir y convencer.</p>
+      <ol>
+        <li>Averigua quién decide sobre movilidad en Portoviejo.</li>
+        <li>Junta datos del problema: esperas y quejas.</li>
+        <li>Arma el borrador del plan piloto y sus costos.</li>
+        <li>Prepara las diapositivas.</li>
+      </ol>
+      <div class="sin">Fase 8 · Sin programar</div>
+    </div>
+    <div class="rol">
+      <h3>Programación</h3>
+      <p class="q">Quieres aprender o ya sabes React Native o Django.</p>
+      <ol>
+        <li>Pide acceso al repositorio en GitHub.</li>
+        <li>Elige un <em>Issue</em> del tablero.</li>
+        <li>Trabaja en una rama propia.</li>
+        <li>Abre un <em>pull request</em> a <code>main</code>.</li>
+      </ol>
+      <div class="sin">Fases 0 a 7</div>
+    </div>
+  </div>
+
+  <h3 style="margin:7mm 0 3mm">Riesgos que tenemos presentes</h3>
+  <div class="riesgos">
+    <div class="riesgo"><h4>Mucho alcance</h4><p>Cuatro funciones es bastante. Se sigue el orden de prioridad y con dos ya hay demo.</p></div>
+    <div class="riesgo"><h4>Mucho que aprender</h4><p>Expo, Django y Channels a la vez. Se avanza fase por fase, sin saltarse ninguna.</p></div>
+    <div class="riesgo"><h4>Depender de las autoridades</h4><p>Si dicen que no, los datos y la app siguen sirviendo: se ofrecen a una cooperativa o a los mismos pasajeros.</p></div>
+    <div class="riesgo"><h4>Servicios gratuitos</h4><p>Se duermen o cambian sus condiciones. Siempre hay video de respaldo y se sabe volver a desplegar.</p></div>
+  </div>
+
+  <div class="reglas">
+    <div class="regla"><strong>Una rama por tarea</strong> y un pull request a <code>main</code>.</div>
+    <div class="regla"><strong>No subir recorridos GPS</strong> sin recortar los tramos cerca de casas.</div>
+  </div>
+
+  <div class="cta">
+    <svg viewBox="0 0 120 50" aria-hidden="true">
+      <path d="M0 40 C25 38 30 18 55 20 S95 30 125 8" fill="none" stroke="#F5B700" stroke-width="2" stroke-linecap="round"/>
+      <g fill="#0E3B3A" stroke="#F5B700" stroke-width="1.2"><circle cx="18" cy="37" r="2.2"/><circle cx="55" cy="20" r="2.2"/><circle cx="96" cy="26" r="2.2"/></g>
+      <g transform="translate(76 25) rotate(4)">
+        <rect x="-10" y="-5" width="20" height="10" rx="2.2" fill="#F5B700"/>
+        <g fill="#0E3B3A"><rect x="-8" y="-2" width="3.4" height="3" rx="0.6"/><rect x="-3.6" y="-2" width="3.4" height="3" rx="0.6"/><rect x="0.8" y="-2" width="3.4" height="3" rx="0.6"/><rect x="5.2" y="-2" width="3.4" height="3" rx="0.6"/><circle cx="-5.5" cy="5" r="1.8"/><circle cx="5.5" cy="5" r="1.8"/></g>
+      </g>
+    </svg>
+    <div class="display">El bus ya está saliendo.</div>
+    <p>Si te interesa alguna de estas tareas, escríbeme y te paso el acceso al repositorio. Con que alguien tome una sola línea en la fase 1 ya se avanza muchísimo.</p>
+  </div>
+</section>
+
+</body>
+</html>

@@ -79,6 +79,8 @@ Las velocidades promedio por tramo, que se usan para estimar la llegada, están 
 
 ## Próximos pasos
 
+El plan completo, de la demo a los GPS reales, está en [`ROADMAP.md`](ROADMAP.md) y en PDF en [`docs/Roadmap-Bus-Portoviejo.pdf`](docs/Roadmap-Bus-Portoviejo.pdf).
+
 - [ ] Levantar el recorrido real de una línea con Traccar y reemplazar la ruta de ejemplo.
 - [ ] Medir en la calle la diferencia entre la llegada estimada y la real.
 - [ ] Calcular las velocidades de cada tramo a partir de los recorridos guardados.
