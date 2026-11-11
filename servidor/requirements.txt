@@ -1,0 +1,5 @@
+# Dependencias del servidor. Necesita Python 3.12 o más nuevo (lo exige Django 6.1).
+Django>=6.1,<6.2
+djangorestframework>=3.18,<4
+channels[daphne]>=4.3,<5
+django-cors-headers>=4.9,<5

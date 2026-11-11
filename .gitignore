@@ -1,13 +1,25 @@
-# Posiciones GPS reales: son datos personales de quien llevaba el celular
-app/recorridos/
+# Recorridos GPS: son datos personales de quien llevaba el celular.
+# Antes de compartir uno, recorta los tramos cerca de casas y súbelo a datos/ a mano.
+*.gpx
+!datos/**/*.gpx
 
 # Python
 __pycache__/
 *.pyc
+.venv/
+venv/
+servidor/db.sqlite3
+servidor/staticfiles/
+.env
 
-# Pruebas locales y configuración de cada persona
-prueba*.html
+# Node / Expo (el resto está en movil/.gitignore)
+node_modules/
+
+# Configuración de cada persona y de cada herramienta
 .claude/
+!movil/.claude/
+.claude/settings.local.json
 .vscode/
+.idea/
 .DS_Store
 Thumbs.db
