@@ -1,0 +1,20 @@
+Bus Portoviejo
+Copyright (c) 2026 Los autores de Bus Portoviejo (ver el historial de Git).
+Todos los derechos reservados.
+
+Este software, su código fuente, su documentación y los datos levantados para
+el proyecto (recorridos, paradas y archivos GTFS) son propiedad de sus autores.
+
+No se concede ningún permiso para usar, copiar, modificar, fusionar, publicar,
+distribuir, sublicenciar ni vender copias de este software, total o
+parcialmente, sin la autorización previa y por escrito de sus autores. El
+acceso al repositorio, aunque sea público, no otorga ninguno de esos derechos.
+
+Los integrantes del equipo pueden usar y modificar el código únicamente para
+desarrollar este proyecto.
+
+Las bibliotecas y los datos de terceros que usa el proyecto (por ejemplo,
+Django, Expo, MapLibre y los datos de OpenStreetMap) conservan sus propias
+licencias.
+
+EL SOFTWARE SE ENTREGA "TAL CUAL", SIN GARANTÍAS DE NINGÚN TIPO.

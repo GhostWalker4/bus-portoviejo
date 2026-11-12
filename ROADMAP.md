@@ -24,8 +24,8 @@ Preparar ─► Datos reales ─► Servidor ─► Simulación  ─► App con 
 
 - [x] Antes de borrar el prototipo web, marcarlo con una etiqueta (`git tag prototipo-web`) para poder volver a él cuando haga falta. Su lógica de tiempos de llegada y sus scripts de OpenStreetMap sirven como referencia.
 - [x] Reorganizar el repositorio en dos carpetas: `movil/` (Expo) y `servidor/` (Django).
-- [ ] Instalar Node.js LTS, Python 3, Git y Android Studio (para el emulador y para compilar).
-- [ ] Elegir una licencia, por ejemplo MIT, o dejarlo privado si se piensa vender o licenciar al municipio.
+- [x] Instalar Node.js LTS, Python 3, Git y Android Studio (para el emulador y para compilar).
+- [x] Elegir una licencia: **privada, todos los derechos reservados**, porque se va a licenciar al municipio (ver `LICENSE`).
 - [ ] En GitHub, crear un tablero (*Projects*) y pasar cada tarea de este roadmap a un *Issue*. Así un colega que vuelva puede tomar una tarea sin preguntar por dónde empezar.
 
 **Listo cuando:** `npx create-expo-app` y `django-admin startproject` corren en tu computadora y el repositorio tiene la nueva estructura.
