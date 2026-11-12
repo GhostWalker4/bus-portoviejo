@@ -86,7 +86,7 @@ Antes de subir cambios: `npm run typecheck`.
 | 1 · Datos reales de 2 o 3 líneas | ⏳ siguiente |
 | 2 a 9 | pendientes, ver [`ROADMAP.md`](ROADMAP.md) |
 
-Las tareas están en [Issues](../../issues).
+Las tareas están en el [tablero del proyecto](https://github.com/users/GhostWalker4/projects/1) y en [Issues](../../issues).
 
 ## Créditos
 
@@ -96,4 +96,4 @@ Las tareas están en [Issues](../../issues).
 
 ## Licencia
 
-Por ahora **no tiene licencia**: el código es de sus autores y nadie más tiene permiso de reutilizarlo, aunque el repositorio sea público.
+**Privada, todos los derechos reservados** (ver [`LICENSE`](LICENSE)). El proyecto se va a licenciar al municipio, así que nadie fuera del equipo puede usar, copiar ni distribuir el código ni los datos sin autorización por escrito.

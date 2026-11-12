@@ -4,7 +4,7 @@ Somos pocos y cada uno trabaja con una herramienta de IA distinta (Claude Code, 
 
 ## El ciclo de una tarea
 
-1. **Elige un Issue** en [Issues](../../issues) y **asígnatelo** (o comenta "lo tomo"). Si no hay Issue para lo que quieres hacer, créalo primero.
+1. **Elige un Issue** en el [tablero](https://github.com/users/GhostWalker4/projects/1) (empieza por los de prioridad *Ahora*), **asígnatelo** y pásalo a *En curso*. Si no hay Issue para lo que quieres hacer, créalo primero.
    Una tarea = una persona. Si un Issue ya tiene dueño, no lo toques sin hablar con esa persona.
 2. **Actualiza tu copia** antes de empezar:
 
@@ -30,7 +30,7 @@ Somos pocos y cada uno trabaja con una herramienta de IA distinta (Claude Code, 
    ```
 
    En el pull request escribe `Cierra #12` (con el número del Issue), para que se cierre solo al fusionarlo.
-7. **Otra persona lo revisa** antes de fusionarlo. Nadie sube directo a `main`.
+7. **Otra persona lo revisa** antes de fusionarlo. Nadie sube directo a `main`. Mientras espera, la tarjeta va en *En revisión*; al fusionarse, el Issue se cierra solo y pasa a *Hecho*.
 
 ## Si trabajas con una IA
 
