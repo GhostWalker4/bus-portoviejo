@@ -23,3 +23,8 @@ node_modules/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Archivos que genera datos/convertir_a_gtfs.py y que cada uno regenera
+datos/.cache_osrm.json
+datos/vista_previa.geojson
+datos/ejemplo/gtfs/

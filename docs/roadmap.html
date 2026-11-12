@@ -332,7 +332,7 @@
   <div class="ruta">
     <div class="paralelo"><span>El trabajo de campo sigue mientras se programan las fases 2 a 4</span></div>
     <div class="parada"><div class="punto">0</div><div class="txt"><b>Preparar el terreno</b><span>Herramientas, repositorio nuevo y tablero de tareas.</span></div><span class="tag t-prog">Programación</span></div>
-    <div class="parada campo"><div class="punto">1</div><div class="txt"><b>Datos reales de 2 o 3 líneas</b><span>Viajar en bus grabando el recorrido y anotando las paradas.</span></div><span class="tag t-campo">Campo</span></div>
+    <div class="parada campo"><div class="punto">1</div><div class="txt"><b>Datos reales de 2 o 3 rutas</b><span>Marcar las paradas en uMap y convertirlas a GTFS.</span></div><span class="tag t-campo">Campo</span></div>
     <div class="parada"><div class="punto">2</div><div class="txt"><b>Servidor Django</b><span>Líneas, paradas, panel de administración y API.</span></div><span class="tag t-prog">Programación</span></div>
     <div class="parada"><div class="punto">3</div><div class="txt"><b>Simulación en tiempo real</b><span>Buses ficticios sobre recorridos reales, enviados por WebSocket.</span></div><span class="tag t-prog">Programación</span></div>
     <div class="parada"><div class="punto">4</div><div class="txt"><b>La app con el mapa</b><span>Expo + MapLibre: ver los buses moverse en un Android.</span></div><span class="tag t-prog">Programación</span></div>
@@ -372,18 +372,18 @@
   </div>
 
   <div class="fase campo">
-    <div class="cab"><div class="n">1</div><h3>Datos reales de 2 o 3 líneas<span class="sub">Es la base de todo: sin recorridos reales, la demo no convence.</span></h3><span class="tag t-campo">Campo</span></div>
+    <div class="cab"><div class="n">1</div><h3>Datos reales de 2 o 3 rutas<span class="sub">Es la base de todo: sin rutas reales, la demo no convence.</span></h3><span class="tag t-campo">Campo</span></div>
     <ul class="check">
-      <li>Elegir 2 o 3 líneas que <strong>se crucen</strong> entre sí (para que el viaje A→B tenga transbordos) y que una de ellas pase por la UTM.</li>
-      <li>Viajar en cada línea, ida y vuelta, grabando con <strong>GPSLogger</strong> (Android, gratis). Guarda el recorrido en el celular como GPX y no necesita servidor.</li>
-      <li>Anotar cada parada: nombre, lado de la calle y una foto.</li>
-      <li>Repetir cada línea en 2 o 3 horarios (mañana, mediodía, hora pico) para tener tiempos reales por tramo.</li>
-      <li>Anotar la frecuencia aproximada (cada cuántos minutos pasa un bus) y el horario de servicio.</li>
-      <li>Pasar todo a <strong>GTFS</strong>, el estándar mundial de transporte público. Da buena impresión ante las autoridades y, más adelante, permite que la ciudad aparezca en Google Maps o Moovit por las vías oficiales.</li>
+      <li>Elegir 2 o 3 rutas que <strong>se crucen</strong> entre sí (para que el viaje A→B tenga transbordos) y que una de ellas pase por la UTM.</li>
+      <li>Quienes ya conocen las rutas marcan las paradas en <strong>uMap</strong>, un mapa colaborativo sobre OpenStreetMap: una capa por sentido (<code>Ruta 2 - ida</code>) y un marcador por parada (<code>03 Parque Central</code>).</li>
+      <li>Anotar en <code>rutas.csv</code> la frecuencia aproximada, el horario de servicio y la cooperativa de cada ruta.</li>
+      <li>El conversor <code>convertir_a_gtfs.py</code> junta las paradas compartidas, traza el recorrido por las calles y genera el <strong>GTFS</strong>, el estándar mundial de transporte público.</li>
+      <li>Revisar la vista previa y validar el GTFS con el validador oficial de MobilityData.</li>
+      <li>Más adelante, corregir los tiempos estimados viajando una vez en cada ruta con <strong>GPSLogger</strong>.</li>
     </ul>
-    <div class="nota alerta"><b>Ojo:</b> Google Maps sirve para orientarse, pero sus datos no se pueden copiar: sus términos lo prohíben. Las paradas tienen que salir de la grabación o de la libreta.</div>
-    <div class="nota aviso"><b>Privacidad:</b> un archivo GPX dice dónde estuvo una persona. Antes de subirlo, recorta los tramos cercanos a casas.</div>
-    <div class="listo"><b>Listo cuando:</b> hay trazado, paradas y tiempos por tramo de 2 o 3 líneas, en GTFS dentro de <code>datos/</code>.</div>
+    <div class="nota alerta"><b>Ojo:</b> Google Maps sirve para acordarse de una ruta, pero sus datos no se pueden copiar: sus términos lo prohíben. Los marcadores salen de lo que ustedes saben y vieron.</div>
+    <div class="nota aviso"><b>Guía:</b> el paso a paso para marcar, exportar y convertir está en <code>datos/GUIA_UMAP.md</code>.</div>
+    <div class="listo"><b>Listo cuando:</b> hay paradas, recorridos y frecuencias de 2 o 3 rutas, en GTFS dentro de <code>datos/gtfs/</code>, sin errores del validador.</div>
   </div>
 
   <div class="pie"><span class="marca"><i></i>Bus Portoviejo · Roadmap</span><span>4</span></div>
@@ -513,12 +513,12 @@
   <div class="grid3">
     <div class="rol campo">
       <h3>Trabajo de campo</h3>
-      <p class="q">Te gusta moverte por la ciudad y no te molesta viajar en bus.</p>
+      <p class="q">Conoces las rutas de bus de Portoviejo.</p>
       <ol>
-        <li>Instala GPSLogger en tu Android.</li>
-        <li>Elige una de las líneas del proyecto.</li>
-        <li>Haz el recorrido de ida y vuelta grabando.</li>
-        <li>Anota y fotografía cada parada.</li>
+        <li>Elige una ruta que conozcas bien.</li>
+        <li>Abre el mapa del proyecto en uMap.</li>
+        <li>Marca sus paradas, ida y vuelta, en orden.</li>
+        <li>Anota cada cuánto pasa y su horario.</li>
       </ol>
       <div class="sin">Fase 1 · Sin programar</div>
     </div>
