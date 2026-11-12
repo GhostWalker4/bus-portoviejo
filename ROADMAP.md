@@ -30,20 +30,23 @@ Preparar ─► Datos reales ─► Servidor ─► Simulación  ─► App con 
 
 **Listo cuando:** `npx create-expo-app` y `django-admin startproject` corren en tu computadora y el repositorio tiene la nueva estructura.
 
-## Fase 1: Datos reales de 2 o 3 líneas (trabajo de campo)
+## Fase 1: Datos reales de 2 o 3 rutas (trabajo de campo)
 
-Es la base de todo: sin recorridos reales, la demo no convence. Se hace **en paralelo** con las fases 2 a 4 y es la tarea ideal para los colegas.
+Es la base de todo: sin rutas reales, la demo no convence. Se hace **en paralelo** con las fases 2 a 4 y es la tarea ideal para los colegas.
 
-- [ ] Elegir 2 o 3 líneas que **se crucen** entre sí (para que el planificador A→B tenga transbordos) y que una de ellas pase por la UTM.
-- [ ] Viajar en cada línea, ida y vuelta, con el celular grabando el recorrido. Como el servidor del prototipo se va a borrar, conviene usar **GPSLogger** (Android, gratis y de código abierto), que guarda el recorrido en el celular como archivo GPX sin necesitar servidor.
-- [ ] Anotar cada parada: nombre, lado de la calle y una foto. Google Maps sirve para orientarse, pero **sus datos no se pueden copiar** porque sus términos lo prohíben. Los puntos tienen que salir de la grabación o de la libreta.
-- [ ] Repetir cada línea en 2 o 3 horarios (mañana, mediodía, hora pico) para tener tiempos reales por tramo.
-- [ ] Anotar la frecuencia aproximada (cada cuántos minutos pasa un bus) y el horario de servicio.
-- [ ] Pasar todo a formato **GTFS**, el estándar mundial de transporte público. A las autoridades les da una buena impresión y, más adelante, permite que la ciudad aparezca en Google Maps o en Moovit por las vías oficiales.
+**Cambio de plan (noviembre de 2026):** en lugar de seguir los buses o viajar grabando, quienes ya conocen las rutas **marcan las paradas en uMap** (un mapa colaborativo sobre OpenStreetMap) y un script las convierte en GTFS. Es más rápido y no hay que perseguir a nadie. Guía paso a paso: [`datos/GUIA_UMAP.md`](datos/GUIA_UMAP.md).
 
-**Privacidad:** los archivos GPX dicen dónde estuvo una persona. Antes de subirlos, recorta los tramos cercanos a casas.
+- [ ] Elegir 2 o 3 rutas que **se crucen** entre sí (para que el planificador A→B tenga transbordos) y que una de ellas pase por la UTM.
+- [ ] Crear el mapa en uMap y compartirlo con quienes van a marcar.
+- [ ] Marcar las paradas de cada ruta, ida y vuelta: una capa por sentido (`Ruta 2 - ida`) y un marcador por parada con su número de orden (`03 Parque Central`). Google Maps sirve para acordarse, pero **sus datos no se pueden copiar** porque sus términos lo prohíben.
+- [ ] Anotar en `datos/rutas.csv` la frecuencia aproximada (cada cuántos minutos pasa un bus), el horario de servicio y la cooperativa de cada ruta.
+- [x] Escribir el conversor a **GTFS** (`datos/convertir_a_gtfs.py`), el estándar mundial de transporte público. Junta las paradas que comparten varias rutas, calcula el recorrido por las calles con OSRM y estima los tiempos entre paradas.
+- [ ] Generar el primer GTFS real, revisarlo en la vista previa y validarlo en <https://gtfs-validator.mobilitydata.org/>. A las autoridades les da una buena impresión y, más adelante, permite que la ciudad aparezca en Google Maps o en Moovit por las vías oficiales.
+- [ ] Más adelante, corregir los tiempos estimados viajando una vez en cada ruta con **GPSLogger** (Android, gratis).
 
-**Listo cuando:** existen el trazado, las paradas y los tiempos por tramo de 2 o 3 líneas, en GTFS dentro de `datos/`.
+**Privacidad:** si se graban recorridos con GPS, el archivo dice dónde estuvo una persona. Antes de subirlo, recorta los tramos cercanos a casas.
+
+**Listo cuando:** existen las paradas, los recorridos y las frecuencias de 2 o 3 rutas, en GTFS dentro de `datos/gtfs/`, y el validador no marca errores.
 
 ## Fase 2: Servidor Django (la base)
 
@@ -122,7 +125,7 @@ Solo si hay financiamiento o un piloto aprobado.
 
 | Si te interesa… | Empieza por |
 |---|---|
-| **Trabajo de campo** | Fase 1: elige una línea, viaja con GPSLogger y anota las paradas. No hace falta programar. |
+| **Trabajo de campo** | Fase 1: elige una ruta que conozcas y marca sus paradas en uMap ([guía](datos/GUIA_UMAP.md)). No hace falta programar. |
 | **Presentación y contactos** | Fase 8: arma el documento del problema y del plan piloto, e investiga quién decide en movilidad. |
 | **Programar** | Toma un *Issue* del tablero de GitHub con la etiqueta de su fase. |
 

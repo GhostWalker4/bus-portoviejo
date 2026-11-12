@@ -13,7 +13,7 @@ App Android que muestra los buses urbanos de Portoviejo (Ecuador) en tiempo real
 
 - `movil/`: React Native + Expo + TypeScript. Lee también `movil/AGENTS.md`: Expo cambia mucho entre versiones y hay que consultar la documentación de la versión instalada.
 - `servidor/`: Django 6.1 + Django REST Framework + Django Channels (WebSockets, con la capa en memoria; sin Redis hasta la fase 9). La app de Django del dominio es `transporte`.
-- `datos/`: recorridos y GTFS de las líneas reales.
+- `datos/`: las rutas reales. Las paradas se marcan en uMap (`datos/GUIA_UMAP.md`) y `datos/convertir_a_gtfs.py` genera el GTFS en `datos/gtfs/`. El conversor solo usa la biblioteca estándar de Python: no le agregues dependencias.
 
 ## Cómo trabajar
 
@@ -23,6 +23,7 @@ App Android que muestra los buses urbanos de Portoviejo (Ecuador) en tiempo real
 - Al terminar, comprueba:
   - Servidor: `python manage.py test` desde `servidor/` (con el entorno `.venv` activado).
   - App: `npm run typecheck` desde `movil/`.
+  - Datos: `python -m unittest discover -s datos` desde la raíz.
 - Para agregar paquetes a la app usa `npx expo install <paquete>`, no `npm install <paquete>`.
 - Para agregar paquetes al servidor, agrégalos también a `servidor/requirements.txt` con un rango de versión.
 - El mensaje de posición de un bus tiene que tener siempre la forma que mandará el GPS real: `bus`, `lat`, `lon`, `velocidad`, `rumbo`, `hora`. Así, cuando haya GPS físicos, la app no se toca.

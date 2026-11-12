@@ -1,0 +1,315 @@
+{
+ "type": "umap",
+ "uri": "https://umap.openstreetmap.fr/es/map/ejemplo",
+ "properties": {
+  "name": "Bus Portoviejo (EJEMPLO)"
+ },
+ "layers": [
+  {
+   "type": "FeatureCollection",
+   "features": [],
+   "properties": {
+    "name": "Ruta 90"
+   },
+   "layers": [
+    {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         -80.47069,
+         -1.06364
+        ]
+       },
+       "properties": {
+        "name": "01 U. San Gregorio",
+        "description": "EJEMPLO inventado"
+       }
+      },
+      {
+       "type": "Feature",
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         -80.46549,
+         -1.06084
+        ]
+       },
+       "properties": {
+        "name": "02 Paseo Shopping",
+        "description": "EJEMPLO inventado"
+       }
+      },
+      {
+       "type": "Feature",
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         -80.45852,
+         -1.06199
+        ]
+       },
+       "properties": {
+        "name": "03 Terminal Terrestre",
+        "description": "EJEMPLO inventado"
+       }
+      },
+      {
+       "type": "Feature",
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         -80.4491,
+         -1.06
+        ]
+       },
+       "properties": {
+        "name": "04 Parque Las Vegas",
+        "description": "EJEMPLO inventado"
+       }
+      },
+      {
+       "type": "Feature",
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         -80.45094,
+         -1.05765
+        ]
+       },
+       "properties": {
+        "name": "05 Parque Central",
+        "description": "EJEMPLO inventado"
+       }
+      },
+      {
+       "type": "Feature",
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         -80.45379,
+         -1.05234
+        ]
+       },
+       "properties": {
+        "name": "06 Catedral",
+        "description": "EJEMPLO inventado"
+       }
+      },
+      {
+       "type": "Feature",
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         -80.4544,
+         -1.04852
+        ]
+       },
+       "properties": {
+        "name": "07 Estadio Reales Tamarindos",
+        "description": "EJEMPLO inventado"
+       }
+      },
+      {
+       "type": "Feature",
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         -80.45533,
+         -1.04381
+        ]
+       },
+       "properties": {
+        "name": "08 UTM",
+        "description": "EJEMPLO inventado"
+       }
+      }
+     ],
+     "properties": {
+      "name": "Ruta 90 - ida"
+     }
+    },
+    {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         -80.45521000000001,
+         -1.04369
+        ]
+       },
+       "properties": {
+        "name": "01 UTM",
+        "description": "EJEMPLO inventado"
+       }
+      },
+      {
+       "type": "Feature",
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         -80.45428000000001,
+         -1.0484
+        ]
+       },
+       "properties": {
+        "name": "02 Estadio Reales Tamarindos",
+        "description": "EJEMPLO inventado"
+       }
+      },
+      {
+       "type": "Feature",
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         -80.45367,
+         -1.0522200000000002
+        ]
+       },
+       "properties": {
+        "name": "03 Catedral",
+        "description": "EJEMPLO inventado"
+       }
+      },
+      {
+       "type": "Feature",
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         -80.45082000000001,
+         -1.05753
+        ]
+       },
+       "properties": {
+        "name": "04 Parque Central",
+        "description": "EJEMPLO inventado"
+       }
+      },
+      {
+       "type": "Feature",
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         -80.4584,
+         -1.06187
+        ]
+       },
+       "properties": {
+        "name": "05 Terminal Terrestre",
+        "description": "EJEMPLO inventado"
+       }
+      },
+      {
+       "type": "Feature",
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         -80.47057000000001,
+         -1.06352
+        ]
+       },
+       "properties": {
+        "name": "06 U. San Gregorio",
+        "description": "EJEMPLO inventado"
+       }
+      }
+     ],
+     "properties": {
+      "name": "Ruta 90 - vuelta"
+     }
+    }
+   ]
+  },
+  {
+   "type": "FeatureCollection",
+   "features": [
+    {
+     "type": "Feature",
+     "geometry": {
+      "type": "Point",
+      "coordinates": [
+       -80.45528,
+       -1.0437599999999998
+      ]
+     },
+     "properties": {
+      "name": "01 UTM",
+      "description": "EJEMPLO inventado"
+     }
+    },
+    {
+     "type": "Feature",
+     "geometry": {
+      "type": "Point",
+      "coordinates": [
+       -80.46445,
+       -1.0489499999999998
+      ]
+     },
+     "properties": {
+      "name": "02 Av. Manabí",
+      "description": "EJEMPLO inventado"
+     }
+    },
+    {
+     "type": "Feature",
+     "geometry": {
+      "type": "Point",
+      "coordinates": [
+       -80.46315,
+       -1.0568499999999998
+      ]
+     },
+     "properties": {
+      "name": "03 Av. América",
+      "description": "EJEMPLO inventado"
+     }
+    },
+    {
+     "type": "Feature",
+     "geometry": {
+      "type": "Point",
+      "coordinates": [
+       -80.45846999999999,
+       -1.0619399999999999
+      ]
+     },
+     "properties": {
+      "name": "04 Terminal",
+      "description": "EJEMPLO inventado"
+     }
+    }
+   ],
+   "properties": {
+    "name": "Ruta 91 - ida"
+   }
+  },
+  {
+   "type": "FeatureCollection",
+   "features": [
+    {
+     "type": "Feature",
+     "geometry": {
+      "type": "Point",
+      "coordinates": [
+       -80.455,
+       -1.05
+      ]
+     },
+     "properties": {
+      "name": "nota suelta"
+     }
+    }
+   ],
+   "properties": {
+    "name": "Notas"
+   }
+  }
+ ]
+}

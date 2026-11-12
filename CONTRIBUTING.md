@@ -23,6 +23,7 @@ Somos pocos y cada uno trabaja con una herramienta de IA distinta (Claude Code, 
 5. **Comprueba que nada se rompió:**
    - Servidor: `python manage.py test` (desde `servidor/`)
    - App: `npm run typecheck` (desde `movil/`)
+   - Datos: `python -m unittest discover -s datos` (desde la raíz)
 6. **Sube tu rama y abre un pull request** a `main`:
 
    ```bash
