@@ -26,7 +26,7 @@ Preparar ─► Datos reales ─► Servidor ─► Simulación  ─► App con 
 - [x] Reorganizar el repositorio en dos carpetas: `movil/` (Expo) y `servidor/` (Django).
 - [x] Instalar Node.js LTS, Python 3, Git y Android Studio (para el emulador y para compilar).
 - [x] Elegir una licencia: **privada, todos los derechos reservados**, porque se va a licenciar al municipio (ver `LICENSE`).
-- [ ] En GitHub, crear un tablero (*Projects*) y pasar cada tarea de este roadmap a un *Issue*. Así un colega que vuelva puede tomar una tarea sin preguntar por dónde empezar.
+- [x] En GitHub, crear un [tablero](https://github.com/users/GhostWalker4/projects/1) (*Projects*) y pasar cada tarea de este roadmap a un *Issue*. Así un colega que vuelva puede tomar una tarea sin preguntar por dónde empezar.
 
 **Listo cuando:** `npx create-expo-app` y `django-admin startproject` corren en tu computadora y el repositorio tiene la nueva estructura.
 
