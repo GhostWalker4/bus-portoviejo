@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Bus Portoviejo · Simulación Ruta 6 en Vivo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    :root {
+      --primary: #E63946;
+      --primary-dark: #C1121F;
+      --ida-color: #2A9D8F;
+      --vuelta-color: #E63946;
+      --dark: #1D3557;
+      --light: #F8F9FA;
+      --surface: rgba(255, 255, 255, 0.95);
+      --border: rgba(0, 0, 0, 0.08);
+      --shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+    body, html {
+      margin: 0; padding: 0; height: 100%; width: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #eef2f5; color: #212529; overflow: hidden;
+    }
+
+    #map { width: 100%; height: 100%; z-index: 1; }
+
+    /* Top Navigation / Status Header */
+    .header-panel {
+      position: absolute; top: 16px; left: 64px; z-index: 1000;
+      background: var(--surface); backdrop-filter: blur(8px);
+      padding: 14px 22px; border-radius: 16px; box-shadow: var(--shadow);
+      border: 1px solid var(--border); border-left: 6px solid var(--primary);
+      max-width: 440px; pointer-events: auto;
+    }
+    .badge-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 12px;
+      letter-spacing: 0.4px; text-transform: uppercase;
+    }
+    .badge-route { background: var(--primary); color: white; }
+    .badge-ws {
+      background: #E9ECEF; color: #495057; transition: all 0.3s ease;
+    }
+    .badge-ws.connected { background: #D1E7DD; color: #0F5132; }
+    .badge-ws.disconnected { background: #F8D7DA; color: #842029; }
+    .pulse-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: #6C757D;
+      display: inline-block;
+    }
+    .badge-ws.connected .pulse-dot {
+      background: #198754;
+      box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.7);
+      animation: pulse 1.5s infinite;
+    }
+    .badge-ws.disconnected .pulse-dot { background: #DC3545; }
+
+    @keyframes pulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(25, 135, 84, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(25, 135, 84, 0); }
+    }
+
+    h1 { margin: 0 0 4px 0; font-size: 20px; font-weight: 800; color: #111; }
+    p.subtitle { margin: 0; font-size: 12.5px; color: #555; line-height: 1.4; }
+
+    /* Floating Telemetry Sidebar */
+    .sidebar {
+      position: absolute; top: 16px; right: 16px; bottom: 16px; z-index: 1000;
+      width: 340px; background: var(--surface); backdrop-filter: blur(10px);
+      border-radius: 18px; box-shadow: var(--shadow); border: 1px solid var(--border);
+      display: flex; flex-direction: column; overflow: hidden; pointer-events: auto;
+      transition: transform 0.3s ease;
+    }
+    .sidebar-header {
+      padding: 16px 18px; background: #fff; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .sidebar-header h2 { margin: 0; font-size: 15px; font-weight: 700; color: #222; }
+    .sidebar-body {
+      flex: 1; overflow-y: auto; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px;
+    }
+
+    /* Bus Card in Telemetry */
+    .bus-card {
+      background: white; border-radius: 12px; padding: 12px 14px;
+      border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      cursor: pointer; transition: all 0.2s ease;
+    }
+    .bus-card:hover {
+      transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.09);
+      border-color: var(--primary);
+    }
+    .bus-card-header {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
+    }
+    .bus-title {
+      font-weight: 800; font-size: 14px; color: #111; display: flex; align-items: center; gap: 6px;
+    }
+    .bus-speed-badge {
+      background: #eef6ff; color: #0066cc; font-weight: 700; font-size: 11px;
+      padding: 2px 8px; border-radius: 8px;
+    }
+    .bus-meta-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 11.5px; color: #555;
+    }
+    .bus-meta-item strong { color: #222; }
+
+    /* Layer Controls inside sidebar */
+    .control-box {
+      background: #f8f9fa; border-radius: 12px; padding: 12px; font-size: 12px;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    .control-box h3 { margin: 0 0 8px 0; font-size: 12px; font-weight: 700; text-transform: uppercase; color: #666; }
+    .toggle-row {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;
+    }
+    .toggle-row:last-child { margin-bottom: 0; }
+    .toggle-label { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 500; }
+    .color-dot { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+
+    /* Custom Leaflet Marker Styles */
+    .bus-marker-icon {
+      position: relative; width: 44px; height: 44px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .bus-badge-label {
+      position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+      background: #111; color: #fff; font-size: 10px; font-weight: 700;
+      padding: 1px 6px; border-radius: 6px; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      pointer-events: none;
+    }
+    .bus-icon-circle {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--primary); border: 2.5px solid #ffffff;
+      box-shadow: 0 3px 10px rgba(230, 57, 70, 0.45);
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.4s ease;
+    }
+    .bus-pointer {
+      position: absolute; width: 0; height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-bottom: 8px solid #ffffff;
+      top: 1px; left: calc(50% - 5px);
+    }
+    .bus-svg { width: 18px; height: 18px; fill: white; }
+
+    .stop-marker-ida, .stop-marker-vuelta {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 2px solid #ffffff; box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; font-weight: 700; color: white;
+    }
+    .stop-marker-ida { background: var(--ida-color); }
+    .stop-marker-vuelta { background: var(--vuelta-color); }
+
+    .legend-bar {
+      margin-top: 6px; font-size: 11px; color: #666; display: flex; gap: 14px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 5px; }
+
+    /* Bottom Info Bar */
+    .footer-bar {
+      padding: 10px 14px; background: #fff; border-top: 1px solid var(--border);
+      font-size: 11px; color: #666; display: flex; justify-content: space-between; align-items: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header / Overview -->
+  <div class="header-panel">
+    <div class="badge-row">
+      <span class="badge badge-route">Ruta 6 · Bus Rojo</span>
+      <span id="wsStatusBadge" class="badge badge-ws disconnected">
+        <span class="pulse-dot"></span>
+        <span id="wsStatusText">Conectando...</span>
+      </span>
+    </div>
+    <h1>Simulación en Tiempo Real</h1>
+    <p class="subtitle">Buses simulados emitiendo coordenadas GPS por WebSocket (Fase 3).</p>
+    <div class="legend-bar">
+      <div class="legend-item"><span class="color-dot" style="background: var(--ida-color);"></span> Ida (3.8 km · 7 paradas)</div>
+      <div class="legend-item"><span class="color-dot" style="background: var(--vuelta-color);"></span> Vuelta (27.8 km · 15 paradas)</div>
+    </div>
+  </div>
+
+  <!-- Map Container -->
+  <div id="map"></div>
+
+  <!-- Telemetry Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h2>📡 Telemetría en Vivo</h2>
+      <span id="busCountBadge" style="font-size: 11px; font-weight: 700; color: var(--primary);">0 buses</span>
+    </div>
+
+    <div class="sidebar-body">
+      <!-- Layer Toggles -->
+      <div class="control-box">
+        <h3>Capas del Mapa</h3>
+        <div class="toggle-row">
+          <label class="toggle-label">
+            <input type="checkbox" id="chkIda" checked>
+            <span class="color-dot" style="background: var(--ida-color);"></span> Trazado de Ida
+          </label>
+        </div>
+        <div class="toggle-row">
+          <label class="toggle-label">
+            <input type="checkbox" id="chkVuelta" checked>
+            <span class="color-dot" style="background: var(--vuelta-color);"></span> Trazado de Vuelta
+          </label>
+        </div>
+        <div class="toggle-row">
+          <label class="toggle-label">
+            <input type="checkbox" id="chkParadas" checked>
+            <span class="color-dot" style="background: #4A5568;"></span> Ver 22 Paradas
+          </label>
+        </div>
+      </div>
+
+      <!-- Bus Live Cards List -->
+      <div id="busCardsContainer">
+        <div style="font-size: 12px; color: #888; text-align: center; padding: 20px;">
+          Esperando datos de posición del WebSocket...
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span id="lastTickTime">Última señal: --:--:--</span>
+      <button onclick="centrarMapa()" style="background: none; border: 1px solid #ddd; padding: 2px 8px; border-radius: 6px; font-size: 10px; cursor: pointer;">
+        Centrar Todo
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Configuración de endpoints (soporta local o remoto)
+    const HOST = window.location.host || 'localhost:8000';
+    const PROTOCOL = window.location.protocol === 'https:' ? 'https:' : 'http:';
+    const WS_PROTOCOL = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const API_BASE = `${PROTOCOL}//${HOST}`;
+    const WS_URL = `${WS_PROTOCOL}//${HOST}/ws/lineas/1/`;
+
+    // 1. Inicializar Mapa en Portoviejo
+    const map = L.map('map', {
+      zoomControl: false
+    }).setView([-1.0545, -80.455], 13);
+
+    // Zoom control en la esquina inferior izquierda
+    L.control.zoom({ position: 'bottomleft' }).addTo(map);
+
+    // CartoDB Positron tiles (limpio y moderno) con fallback a OSM
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+      maxZoom: 19
+    }).addTo(map);
+
+    // Grupos de capas
+    const capaIda = L.featureGroup().addTo(map);
+    const capaVuelta = L.featureGroup().addTo(map);
+    const capaParadas = L.featureGroup().addTo(map);
+    const capaBuses = L.layerGroup().addTo(map);
+
+    // Marcadores de buses
+    const busMarkers = {}; // id -> L.marker
+
+    // Crear icono SVG para el bus
+    function crearIconoBus(numero, rumbo) {
+      return L.divIcon({
+        className: 'bus-marker-icon-wrapper',
+        html: `
+          <div class="bus-marker-icon">
+            <div class="bus-badge-label">${numero}</div>
+            <div class="bus-icon-circle" style="transform: rotate(${rumbo || 0}deg);">
+              <div class="bus-pointer"></div>
+              <svg class="bus-svg" viewBox="0 0 24 24">
+                <path d="M4 16c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h8v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V6h12v5z"/>
+              </svg>
+            </div>
+          </div>
+        `,
+        iconSize: [44, 44],
+        iconAnchor: [22, 22]
+      });
+    }
+
+    // 2. Cargar Trazados desde la API
+    async function cargarTrazados() {
+      try {
+        const resp = await fetch(`${API_BASE}/api/lineas/1/trazado/`);
+        if (!resp.ok) throw new Error('Error al cargar trazado');
+        const datos = await resp.json();
+
+        if (datos.ida && datos.ida.length > 0) {
+          L.polyline(datos.ida, {
+            color: '#2A9D8F',
+            weight: 5,
+            opacity: 0.85,
+            lineJoin: 'round'
+          }).bindPopup('<strong>Ruta 6 · Sentido Ida</strong><br>San Gregorio ➔ Centro (3.8 km)').addTo(capaIda);
+        }
+
+        if (datos.vuelta && datos.vuelta.length > 0) {
+          L.polyline(datos.vuelta, {
+            color: '#E63946',
+            weight: 4,
+            opacity: 0.85,
+            dashArray: '8, 6',
+            lineJoin: 'round'
+          }).bindPopup('<strong>Ruta 6 · Sentido Vuelta</strong><br>Centro ➔ Vía Crucita ➔ San Gregorio (27.8 km)').addTo(capaVuelta);
+        }
+
+        centrarMapa();
+      } catch (err) {
+        console.error('Error cargando trazados:', err);
+      }
+    }
+
+    // 3. Cargar Paradas desde la API
+    async function cargarParadas() {
+      try {
+        const resp = await fetch(`${API_BASE}/api/lineas/1/paradas/`);
+        if (!resp.ok) throw new Error('Error al cargar paradas');
+        const datos = await resp.json();
+
+        // Paradas Ida
+        (datos.ida || []).forEach(p => {
+          const icon = L.divIcon({
+            className: 'stop-icon-wrapper',
+            html: `<div class="stop-marker-ida">${p.orden}</div>`,
+            iconSize: [18, 18],
+            iconAnchor: [9, 9]
+          });
+          L.marker([p.lat, p.lon], { icon }).bindPopup(`
+            <strong>🚏 Parada ${p.orden} (Ida)</strong><br>
+            <strong>${p.nombre}</strong><br>
+            <small>Tiempo estimado: ~${Math.round(p.segundos_desde_inicio / 60)} min</small>
+          `).addTo(capaParadas);
+        });
+
+        // Paradas Vuelta
+        (datos.vuelta || []).forEach(p => {
+          const icon = L.divIcon({
+            className: 'stop-icon-wrapper',
+            html: `<div class="stop-marker-vuelta">${p.orden}</div>`,
+            iconSize: [18, 18],
+            iconAnchor: [9, 9]
+          });
+          L.marker([p.lat, p.lon], { icon }).bindPopup(`
+            <strong>🚏 Parada ${p.orden} (Vuelta)</strong><br>
+            <strong>${p.nombre}</strong><br>
+            <small>Tiempo estimado: ~${Math.round(p.segundos_desde_inicio / 60)} min</small>
+          `).addTo(capaParadas);
+        });
+
+      } catch (err) {
+        console.error('Error cargando paradas:', err);
+      }
+    }
+
+    function centrarMapa() {
+      const bounds = L.latLngBounds([]);
+      if (capaIda.getLayers().length > 0) bounds.extend(capaIda.getBounds());
+      if (capaVuelta.getLayers().length > 0) bounds.extend(capaVuelta.getBounds());
+      if (bounds.isValid()) {
+        map.fitBounds(bounds, { padding: [50, 50] });
+      }
+    }
+
+    // 4. Conexión WebSocket para Simulación en Tiempo Real
+    let socket = null;
+
+    function conectarWebSocket() {
+      const badge = document.getElementById('wsStatusBadge');
+      const text = document.getElementById('wsStatusText');
+
+      badge.className = 'badge badge-ws';
+      text.innerText = 'Conectando...';
+
+      socket = new WebSocket(WS_URL);
+
+      socket.onopen = () => {
+        badge.className = 'badge badge-ws connected';
+        text.innerText = 'En Vivo (WebSocket)';
+      };
+
+      socket.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(event.data);
+          if (msg.tipo === 'posicion' && Array.isArray(msg.posiciones)) {
+            actualizarPosicionesBuses(msg.posiciones);
+          }
+        } catch (err) {
+          console.error('Error parseando mensaje WS:', err);
+        }
+      };
+
+      socket.onclose = () => {
+        badge.className = 'badge badge-ws disconnected';
+        text.innerText = 'Desconectado (Reintentando...)';
+        setTimeout(conectarWebSocket, 2500);
+      };
+
+      socket.onerror = (err) => {
+        console.error('Error en WebSocket:', err);
+        socket.close();
+      };
+    }
+
+    function getCardinal(deg) {
+      const val = Math.floor((deg / 22.5) + 0.5);
+      const arr = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSO", "SO", "OSO", "O", "ONO", "NO", "NNO"];
+      return arr[(val % 16)];
+    }
+
+    // Actualizar marcadores y tarjetas
+    function actualizarPosicionesBuses(posiciones) {
+      document.getElementById('busCountBadge').innerText = `${posiciones.length} buses`;
+      document.getElementById('lastTickTime').innerText = `Última señal: ${new Date().toLocaleTimeString()}`;
+
+      let cardsHtml = '';
+
+      posiciones.forEach(p => {
+        const id = p.bus;
+        const latLng = [p.lat, p.lon];
+        const cardinal = getCardinal(p.rumbo);
+
+        // Actualizar o crear marcador en mapa
+        if (busMarkers[id]) {
+          busMarkers[id].setLatLng(latLng);
+          busMarkers[id].setIcon(crearIconoBus(id, p.rumbo));
+        } else {
+          const marker = L.marker(latLng, {
+            icon: crearIconoBus(id, p.rumbo),
+            zIndexOffset: 1000
+          }).bindPopup(`
+            <div style="font-size: 13px;">
+              <strong style="color: var(--primary); font-size: 14px;">🚍 ${p.bus}</strong><br>
+              <strong>Velocidad:</strong> ${p.velocidad} km/h<br>
+              <strong>Rumbo:</strong> ${p.rumbo}° (${cardinal})<br>
+              <strong>Coordenadas:</strong> ${p.lat.toFixed(5)}, ${p.lon.toFixed(5)}<br>
+              <small style="color: #666;">Hora GPS: ${new Date(p.hora).toLocaleTimeString()}</small>
+            </div>
+          `);
+          marker.addTo(capaBuses);
+          busMarkers[id] = marker;
+        }
+
+        // Construir tarjeta de telemetría
+        cardsHtml += `
+          <div class="bus-card" onclick="enfocarBus('${id}', ${p.lat}, ${p.lon})">
+            <div class="bus-card-header">
+              <span class="bus-title">🚍 ${p.bus}</span>
+              <span class="bus-speed-badge">${p.velocidad} km/h</span>
+            </div>
+            <div class="bus-meta-grid">
+              <div class="bus-meta-item">Rumbo: <strong>${p.rumbo}° ${cardinal}</strong></div>
+              <div class="bus-meta-item">Estado: <strong style="color: #198754;">En Ruta</strong></div>
+              <div class="bus-meta-item" style="grid-column: span 2; font-size: 10.5px; color: #777;">
+                GPS: ${p.lat.toFixed(5)}, ${p.lon.toFixed(5)}
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      document.getElementById('busCardsContainer').innerHTML = cardsHtml;
+    }
+
+    function enfocarBus(id, lat, lon) {
+      map.setView([lat, lon], 16, { animate: true });
+      if (busMarkers[id]) {
+        busMarkers[id].openPopup();
+      }
+    }
+
+    // Toggle de capas con checkboxes
+    document.getElementById('chkIda').addEventListener('change', (e) => {
+      if (e.target.checked) map.addLayer(capaIda);
+      else map.removeLayer(capaIda);
+    });
+
+    document.getElementById('chkVuelta').addEventListener('change', (e) => {
+      if (e.target.checked) map.addLayer(capaVuelta);
+      else map.removeLayer(capaVuelta);
+    });
+
+    document.getElementById('chkParadas').addEventListener('change', (e) => {
+      if (e.target.checked) map.addLayer(capaParadas);
+      else map.removeLayer(capaParadas);
+    });
+
+    // Iniciar
+    cargarTrazados();
+    cargarParadas();
+    conectarWebSocket();
+  </script>
+</body>
+</html>

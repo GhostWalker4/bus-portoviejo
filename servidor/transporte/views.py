@@ -1,8 +1,29 @@
+from pathlib import Path
+from django.conf import settings
+from django.http import HttpResponse
+from django.shortcuts import render
 from django.utils import timezone
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from .models import Linea, ParadaEnLinea, Trazado
+
+
+def visor_simulacion(request):
+    """Vista HTML interactiva para visualizar la simulación en tiempo real."""
+    return render(request, 'transporte/simulador.html')
+
+
+def demo_3d(request):
+    """Sirve el prototipo web original con el mapa 3D isométrico y edificios de Portoviejo."""
+    ruta = Path(settings.BASE_DIR).parent / 'demo_prototipo.html'
+    if ruta.exists():
+        with open(ruta, 'r', encoding='utf-8') as f:
+            contenido = f.read()
+        return HttpResponse(contenido, content_type='text/html; charset=utf-8')
+    return HttpResponse('Prototipo 3D no encontrado', status=404)
+
+
 
 
 @api_view(['GET'])
