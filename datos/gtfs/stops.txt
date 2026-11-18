@@ -1,0 +1,23 @@
+stop_id,stop_name,stop_lat,stop_lon
+P001,San Gregorio,-1.070139,-80.473872
+P002,Av. Metropolitana - Shopping,-1.063437,-80.467866
+P003,Av. 15 de Abril,-1.062174,-80.464221
+P004,Terminal Terrestre,-1.061284,-80.458275
+P005,Av. Pedro Gual,-1.061582,-80.459251
+P006,Av. del Ejército,-1.059348,-80.463824
+P007,Centro - Calle Córdova,-1.056157,-80.461418
+P008,Centro - Calle Córdova,-1.056154,-80.461421
+P009,Av. Ramos Iduarte,-1.052992,-80.458161
+P010,UTM - Av. Universitaria,-1.043756,-80.456966
+P011,Los Tamarindos,-1.048717,-80.447452
+P012,Av. Pedro Gual Este,-1.045038,-80.434985
+P013,Paso Lateral Este,-1.039417,-80.428784
+P014,Vía a Crucita,-1.035019,-80.420598
+P015,Retorno Vía Crucita,-1.034643,-80.399044
+P016,Vía a Portoviejo,-1.035620,-80.414793
+P017,Paso Lateral Norte,-1.040887,-80.431026
+P018,Hospital Verdi Cevallos,-1.051131,-80.445725
+P019,Av. Manabí,-1.054124,-80.458138
+P020,Parque Central,-1.060823,-80.458288
+P021,Av. Metropolitana,-1.068240,-80.478137
+P022,San Gregorio,-1.070145,-80.473856

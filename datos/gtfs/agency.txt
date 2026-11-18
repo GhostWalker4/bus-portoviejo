@@ -1,0 +1,2 @@
+agency_id,agency_name,agency_url,agency_timezone,agency_lang
+cooperativa-ciudad-del-valle,Cooperativa Ciudad del Valle,https://github.com/GhostWalker4/bus-portoviejo,America/Guayaquil,es

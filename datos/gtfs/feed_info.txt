@@ -1,0 +1,2 @@
+feed_publisher_name,feed_publisher_url,feed_lang,feed_start_date,feed_end_date,feed_contact_url
+Bus Portoviejo,https://github.com/GhostWalker4/bus-portoviejo,es,20260101,20271231,https://github.com/GhostWalker4/bus-portoviejo/issues
